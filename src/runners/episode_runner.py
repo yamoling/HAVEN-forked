@@ -3,12 +3,12 @@ from functools import partial
 from components.episode_buffer import EpisodeBatch
 import numpy as np
 import warnings
+
 warnings.filterwarnings("ignore")
 import torch as th
 
 
 class EpisodeRunner:
-
     def __init__(self, args, logger):
         self.args = args
         self.logger = logger
@@ -30,10 +30,18 @@ class EpisodeRunner:
         self.log_train_stats_t = -1000000
 
     def setup(self, scheme, macro_scheme, groups, preprocess, macro_preprocess, mac, macro_mac, value_mac, learner):
-        self.new_batch = partial(EpisodeBatch, scheme, groups, self.batch_size, self.episode_limit + 1,
-                                 preprocess=preprocess, device=self.args.device)
-        self.new_macro_batch = partial(EpisodeBatch, macro_scheme, groups, self.batch_size, (self.episode_limit // self.args.k) + 1 + (self.episode_limit % self.args.k != 0),
-                                       preprocess=macro_preprocess, device=self.args.device)
+        self.new_batch = partial(
+            EpisodeBatch, scheme, groups, self.batch_size, self.episode_limit + 1, preprocess=preprocess, device=self.args.device
+        )
+        self.new_macro_batch = partial(
+            EpisodeBatch,
+            macro_scheme,
+            groups,
+            self.batch_size,
+            (self.episode_limit // self.args.k) + 1 + (self.episode_limit % self.args.k != 0),
+            preprocess=macro_preprocess,
+            device=self.args.device,
+        )
         self.mac = mac
         self.macro_mac = macro_mac
         self.value_mac = value_mac
@@ -62,11 +70,10 @@ class EpisodeRunner:
         self.mac.init_hidden(batch_size=self.batch_size)
         self.macro_mac.init_hidden(batch_size=self.batch_size)
         self.value_mac.init_hidden(batch_size=self.batch_size)
-        env_info = {"alive_allies_list": [1 for _ in range(self.env.n_agents)]}
+        env_info = {"alive_allies_list": [1 for _ in range(self.args.n_agents)]}
 
         macro_reward = 0
         while not terminated:
-
             pre_transition_data = {
                 "state": [self.env.get_state()],
                 "avail_actions": [self.env.get_avail_actions()],
@@ -81,19 +88,16 @@ class EpisodeRunner:
                 }
                 self.macro_batch.update(pre_macro_transition_data, ts=self.t // self.args.k)
 
-
             # Pass the entire batch of experiences up till now to the agents
             # Receive the actions for each agent at this timestep in a batch of size 1
             if self.t % self.args.k == 0 and self.t != 0:
-                post_macro_transition_data = {
-                    "macro_actions": macro_actions,
-                    "macro_reward": [(macro_reward,)],
-                    "terminated": [(False,)]
-                }
+                post_macro_transition_data = {"macro_actions": macro_actions, "macro_reward": [(macro_reward,)], "terminated": [(False,)]}  # noqa: F821
                 macro_reward = 0
-                self.macro_batch.update(post_macro_transition_data, ts=self.t//self.args.k-1)
+                self.macro_batch.update(post_macro_transition_data, ts=self.t // self.args.k - 1)
             if self.t % self.args.k == 0:
-                macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=self.t//self.args.k, t_env=self.t_env, test_mode=test_mode)
+                macro_actions = self.macro_mac.select_actions(
+                    self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
+                )
             pre_transition_data = {
                 "subgoals": macro_actions,
             }
@@ -107,7 +111,7 @@ class EpisodeRunner:
             post_transition_data = {
                 "reward": [(reward,)],
                 "actions": actions,
-                "terminated": [(terminated != env_info.get("episode_limit", False),)]
+                "terminated": [(terminated != env_info.get("episode_limit", False),)],
             }
 
             self.batch.update(post_transition_data, ts=self.t)
@@ -117,9 +121,9 @@ class EpisodeRunner:
         post_macro_transition_data = {
             "macro_actions": macro_actions,
             "macro_reward": [(macro_reward,)],
-            "terminated": [(terminated != env_info.get("episode_limit", False),)]
+            "terminated": [(terminated != env_info.get("episode_limit", False),)],
         }
-        #macro_index = (self.t - 1) // self.args.k if ((self.t - 1) % self.args.k) == 0 else (self.t - 1) // self.args.k + 1
+        # macro_index = (self.t - 1) // self.args.k if ((self.t - 1) % self.args.k) == 0 else (self.t - 1) // self.args.k + 1
         macro_index = (self.t - 1) // self.args.k
         self.macro_batch.update(post_macro_transition_data, ts=macro_index)
         last_data = {
@@ -133,16 +137,16 @@ class EpisodeRunner:
             "obs": [self.env.get_obs()],
         }
         self.batch.update(last_data, ts=self.t)
-        self.macro_batch.update(last_macro_data, ts=macro_index+1)
+        self.macro_batch.update(last_macro_data, ts=macro_index + 1)
 
         # Select actions in the last stored state
-        macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index+1, t_env=self.t_env, test_mode=test_mode)
+        macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
         pre_transition_data = {
             "subgoals": macro_actions,
         }
         self.batch.update(pre_transition_data, ts=self.t)
         actions = self.mac.select_actions(self.batch, t_ep=self.t, t_env=self.t_env, test_mode=test_mode)
-        self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index+1)
+        self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index + 1)
         self.batch.update({"actions": actions}, ts=self.t)
 
         cur_stats = self.test_stats if test_mode else self.train_stats
@@ -174,5 +178,5 @@ class EpisodeRunner:
 
         for k, v in stats.items():
             if k != "n_episodes":
-                self.logger.log_stat(prefix + k + "_mean" , v/stats["n_episodes"], self.t_env)
+                self.logger.log_stat(prefix + k + "_mean", v / stats["n_episodes"], self.t_env)
         stats.clear()

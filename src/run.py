@@ -20,7 +20,6 @@ import pickle
 
 
 def run(_run, _config, _log):
-
     # check args sanity
     _config = args_sanity_check(_config, _log)
 
@@ -31,9 +30,7 @@ def run(_run, _config, _log):
     logger = Logger(_log)
 
     _log.info("Experiment Parameters:")
-    experiment_params = pprint.pformat(_config,
-                                       indent=4,
-                                       width=1)
+    experiment_params = pprint.pformat(_config, indent=4, width=1)
     _log.info("\n\n" + experiment_params + "\n")
 
     # configure tensorboard logger
@@ -67,23 +64,22 @@ def run(_run, _config, _log):
 
 
 def evaluate_sequential(args, runner, buffer, macro_buffer):
-
     for _ in range(args.test_nepisode):
         episode_batch, macro_episode_batch = runner.run(test_mode=True)
         buffer.insert_episode_batch(episode_batch)
         macro_buffer.insert_episode_batch(macro_episode_batch)
-    f_buffer = open('{}/buffer.pkl'.format(args.checkpoint_path), 'wb')
+    f_buffer = open("{}/buffer.pkl".format(args.checkpoint_path), "wb")
     pickle.dump(buffer, f_buffer)
-    #f_macro_buffer = open('{}/macro_buffer.pkl'.format(args.checkpoint_path), 'wb')
-    #pickle.dump(macro_buffer, f_macro_buffer)
+    # f_macro_buffer = open('{}/macro_buffer.pkl'.format(args.checkpoint_path), 'wb')
+    # pickle.dump(macro_buffer, f_macro_buffer)
 
     if args.save_replay:
         runner.save_replay()
 
     runner.close_env()
 
-def run_sequential(args, logger):
 
+def run_sequential(args, logger):
     # Init runner so we can get env info
     runner = r_REGISTRY[args.runner](args=args, logger=logger)
 
@@ -113,24 +109,30 @@ def run_sequential(args, logger):
         "macro_reward": {"vshape": (1,)},
         "terminated": {"vshape": (1,), "dtype": th.uint8},
     }
-    groups = {
-        "agents": args.n_agents
-    }
+    groups = {"agents": args.n_agents}
     preprocess = {
         "actions": ("actions_onehot", [OneHot(out_dim=args.n_actions)]),
-        "subgoals": ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)])
+        "subgoals": ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)]),
     }
-    macro_preprocess = {
-        "macro_actions": ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])
-    }
+    macro_preprocess = {"macro_actions": ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])}
 
-    buffer = ReplayBuffer(scheme, groups, args.buffer_size, env_info["episode_limit"] + 1,
-                          preprocess=preprocess,
-                          device="cpu" if args.buffer_cpu_only else args.device)
+    buffer = ReplayBuffer(
+        scheme,
+        groups,
+        args.buffer_size,
+        env_info["episode_limit"] + 1,
+        preprocess=preprocess,
+        device="cpu" if args.buffer_cpu_only else args.device,
+    )
 
-    macro_buffer = ReplayBuffer(macro_scheme, groups, args.buffer_size, (env_info["episode_limit"] // args.k) + 1 + (env_info["episode_limit"] % args.k != 0),
-                                preprocess=macro_preprocess,
-                                device="cpu" if args.buffer_cpu_only else args.device)
+    macro_buffer = ReplayBuffer(
+        macro_scheme,
+        groups,
+        args.buffer_size,
+        (env_info["episode_limit"] // args.k) + 1 + (env_info["episode_limit"] % args.k != 0),
+        preprocess=macro_preprocess,
+        device="cpu" if args.buffer_cpu_only else args.device,
+    )
 
     # Setup multiagent controller here
     mac = mac_REGISTRY[args.mac](buffer.scheme, groups, args)
@@ -141,13 +143,22 @@ def run_sequential(args, logger):
     learner = le_REGISTRY[args.learner](mac, macro_mac, value_mac, buffer.scheme, logger, args)
 
     # Give runner the scheme
-    runner.setup(scheme=scheme, macro_scheme=macro_scheme, groups=groups, preprocess=preprocess, macro_preprocess=macro_preprocess, mac=mac, macro_mac=macro_mac, value_mac=value_mac, learner=learner)
+    runner.setup(
+        scheme=scheme,
+        macro_scheme=macro_scheme,
+        groups=groups,
+        preprocess=preprocess,
+        macro_preprocess=macro_preprocess,
+        mac=mac,
+        macro_mac=macro_mac,
+        value_mac=value_mac,
+        learner=learner,
+    )
 
     if args.use_cuda:
         learner.cuda()
 
     if args.checkpoint_path != "":
-
         timesteps = []
         timestep_to_load = 0
 
@@ -191,12 +202,10 @@ def run_sequential(args, logger):
     logger.console_logger.info("Beginning training for {} timesteps".format(args.t_max))
 
     while runner.t_env <= args.t_max:
-
         # Run for a whole episode at a time
         episode_batch, macro_episode_batch = runner.run(test_mode=False)
         buffer.insert_episode_batch(episode_batch)
         macro_buffer.insert_episode_batch(macro_episode_batch)
-
 
         if macro_buffer.can_sample(args.batch_size):
             episode_sample, ep_ids = macro_buffer.sample(args.batch_size)
@@ -234,10 +243,12 @@ def run_sequential(args, logger):
         # Execute test runs once in a while
         n_test_runs = max(1, args.test_nepisode // runner.batch_size)
         if (runner.t_env - last_test_T) / args.test_interval >= 1.0:
-
             logger.console_logger.info("t_env: {} / {}".format(runner.t_env, args.t_max))
-            logger.console_logger.info("Estimated time left: {}. Time passed: {}".format(
-                time_left(last_time, last_test_T, runner.t_env, args.t_max), time_str(time.time() - start_time)))
+            logger.console_logger.info(
+                "Estimated time left: {}. Time passed: {}".format(
+                    time_left(last_time, last_test_T, runner.t_env, args.t_max), time_str(time.time() - start_time)
+                )
+            )
             last_time = time.time()
 
             last_test_T = runner.t_env
@@ -247,7 +258,7 @@ def run_sequential(args, logger):
         if args.save_model and (runner.t_env - model_save_time >= args.save_model_interval or model_save_time == 0):
             model_save_time = runner.t_env
             save_path = os.path.join(args.local_results_path, "models", args.unique_token, str(runner.t_env))
-            #"results/models/{}".format(unique_token)
+            # "results/models/{}".format(unique_token)
             os.makedirs(save_path, exist_ok=True)
             logger.console_logger.info("Saving models to {}".format(save_path))
 
@@ -266,9 +277,7 @@ def run_sequential(args, logger):
     logger.console_logger.info("Finished Training")
 
 
-
 def args_sanity_check(config, _log):
-
     # set CUDA flags
     # config["use_cuda"] = True # Use cuda whenever possible!
     if config["use_cuda"] and not th.cuda.is_available():
@@ -278,6 +287,6 @@ def args_sanity_check(config, _log):
     if config["test_nepisode"] < config["batch_size_run"]:
         config["test_nepisode"] = config["batch_size_run"]
     else:
-        config["test_nepisode"] = (config["test_nepisode"]//config["batch_size_run"]) * config["batch_size_run"]
+        config["test_nepisode"] = (config["test_nepisode"] // config["batch_size_run"]) * config["batch_size_run"]
 
     return config

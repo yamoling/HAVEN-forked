@@ -33,27 +33,23 @@ class HAVENLearner:
             self.params += list(self.mixer.parameters())
             self.target_mixer = copy.deepcopy(self.mixer)
 
-        self.value_mixer = None
-        if args.value_mixer is not None:
-            if args.value_mixer == "vdn":
-                self.value_mixer = VDNMixer()
-            elif args.value_mixer == "qmix":
-                self.value_mixer = QMixer(args)
-            else:
-                raise ValueError("Mixer {} not recognised.".format(args.value_mixer))
-            self.value_params += list(self.value_mixer.parameters())
-            self.target_value_mixer = copy.deepcopy(self.value_mixer)
+        if args.value_mixer == "vdn":
+            self.value_mixer = VDNMixer()
+        elif args.value_mixer == "qmix":
+            self.value_mixer = QMixer(args)
+        else:
+            raise ValueError("Mixer {} not recognised.".format(args.value_mixer))
+        self.value_params += list(self.value_mixer.parameters())
+        self.target_value_mixer = copy.deepcopy(self.value_mixer)
 
-        self.macro_mixer = None
-        if args.macro_mixer is not None:
-            if args.macro_mixer == "vdn":
-                self.macro_mixer = VDNMixer()
-            elif args.macro_mixer == "qmix":
-                self.macro_mixer = QMixer(args)
-            else:
-                raise ValueError("Mixer {} not recognised.".format(args.macro_mixer))
-            self.macro_params += list(self.macro_mixer.parameters())
-            self.target_macro_mixer = copy.deepcopy(self.macro_mixer)
+        if args.macro_mixer == "vdn":
+            self.macro_mixer = VDNMixer()
+        elif args.macro_mixer == "qmix":
+            self.macro_mixer = QMixer(args)
+        else:
+            raise ValueError("Mixer {} not recognised.".format(args.macro_mixer))
+        self.macro_params += list(self.macro_mixer.parameters())
+        self.target_macro_mixer = copy.deepcopy(self.macro_mixer)
 
         self.optimiser = RMSprop(params=self.params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
         self.macro_optimiser = RMSprop(params=self.macro_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
@@ -89,19 +85,19 @@ class HAVENLearner:
         max_qvals = self.macro_mixer(max_qvals, batch["state"][:, 1:])
 
         values = self.value_mixer(value_out[:, :-1], batch["state"][:, :-1])
-        #target_values = self.target_value_mixer(target_value_out[:, 1:], batch["state"][:, 1:])
+        # target_values = self.target_value_mixer(target_value_out[:, 1:], batch["state"][:, 1:])
 
-        #target_values = rewards + self.args.gamma * max_qvals * (1 - terminated)
+        # target_values = rewards + self.args.gamma * max_qvals * (1 - terminated)
         target_values = rewards + self.args.gamma * max_qvals * (1 - terminated)
-        td_loss = (values - target_values.detach())
+        td_loss = values - target_values.detach()
 
         mask = mask.expand_as(td_loss)
         masked_loss = td_loss * mask
-        masked_loss = (masked_loss ** 2).sum() / mask.sum()
+        masked_loss = (masked_loss**2).sum() / mask.sum()
 
         self.value_optimiser.zero_grad()
         masked_loss.backward()
-        grad_norm = th.nn.utils.clip_grad_norm_(self.value_params, self.args.grad_norm_clip)
+        _grad_norm = th.nn.utils.clip_grad_norm_(self.value_params, self.args.grad_norm_clip)
         self.value_optimiser.step()
 
         if (episode_num - self.last_target_update_episode) / self.args.target_update_interval >= 1.0:
@@ -109,7 +105,6 @@ class HAVENLearner:
             self.last_target_value_update_episode = episode_num
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
             self.logger.log_stat("value_loss", masked_loss.item(), t_env)
-
 
     def train(self, batch: EpisodeBatch, macro_batch: EpisodeBatch, t_env: int, episode_num: int):
         actions = batch["actions"][:, :-1]
@@ -162,7 +157,7 @@ class HAVENLearner:
         targets = intrinsic_reward + self.args.gamma * (1 - terminated) * target_max_qvals
 
         # Td-error
-        td_error = (chosen_action_qvals - targets.detach())
+        td_error = chosen_action_qvals - targets.detach()
 
         mask = mask.expand_as(td_error)
 
@@ -170,7 +165,7 @@ class HAVENLearner:
         masked_td_error = td_error * mask
 
         # Normal L2 loss, take mean over actual data
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error**2).sum() / mask.sum()
 
         # Optimise
         self.optimiser.zero_grad()
@@ -186,11 +181,10 @@ class HAVENLearner:
             self.logger.log_stat("loss", loss.item(), t_env)
             self.logger.log_stat("grad_norm", grad_norm, t_env)
             mask_elems = mask.sum().item()
-            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item()/mask_elems), t_env)
-            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
-            self.logger.log_stat("target_mean", (targets * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
+            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item() / mask_elems), t_env)
+            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
+            self.logger.log_stat("target_mean", (targets * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
             self.log_stats_t = t_env
-
 
     def macro_train(self, batch: EpisodeBatch, t_env: int, episode_num: int):
         # Get the relevant quantities
@@ -239,7 +233,7 @@ class HAVENLearner:
         targets = rewards + self.args.gamma * (1 - terminated) * target_max_qvals
 
         # Td-error
-        td_error = (chosen_action_qvals - targets.detach())
+        td_error = chosen_action_qvals - targets.detach()
 
         mask = mask.expand_as(td_error)
 
@@ -247,7 +241,7 @@ class HAVENLearner:
         masked_td_error = td_error * mask
 
         # Normal L2 loss, take mean over actual data
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error**2).sum() / mask.sum()
 
         # Optimise
         self.macro_optimiser.zero_grad()
@@ -259,7 +253,6 @@ class HAVENLearner:
             self.last_target_macro_update_episode = episode_num
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
             self.logger.log_stat("macro_loss", loss.item(), t_env)
-
 
     def _update_targets(self):
         self.target_mac.load_state(self.mac)
@@ -330,7 +323,6 @@ class HAVENLearner:
             self.macro_mixer.load_state_dict(th.load("{}/macro_mixer.th".format(path), map_location=lambda storage, loc: storage))
         self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
 
-
     def calc_intrinsic_reward(self, batch, macro_batch):
         origin_reward = batch["reward"][:, :-1]
         if self.args.mean_weight:
@@ -346,23 +338,29 @@ class HAVENLearner:
             value_out.append(value)
         value_out = th.stack(value_out, dim=1)
         values = self.value_mixer(value_out, macro_batch["state"])
-        #values = value_out.squeeze(-1)
+        # values = value_out.squeeze(-1)
 
         macro_mac_out = []
         self.macro_mac.init_hidden(macro_batch.batch_size)
         for t in range(macro_batch.max_seq_length):
             agent_outs = self.macro_mac.forward(macro_batch, t=t)
             macro_mac_out.append(agent_outs)
-        macro_mac_out = th.stack(macro_mac_out, dim=1) # Concat over time
+        macro_mac_out = th.stack(macro_mac_out, dim=1)  # Concat over time
         macro_mac_out = th.gather(macro_mac_out, dim=3, index=macro_batch["macro_actions"]).squeeze(3)
         macro_mac_out = self.macro_mixer(macro_mac_out, macro_batch["state"])
 
-        #intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
-        intrinsic_reward = (macro_batch["macro_reward"][:, :-1] + self.args.gamma * values[:, 1:] - values[:, :-1])
+        # intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
+        intrinsic_reward = macro_batch["macro_reward"][:, :-1] + self.args.gamma * values[:, 1:] - values[:, :-1]
         intrinsic_reward = intrinsic_reward.unsqueeze(-2)
         gap = intrinsic_reward.size(1) * self.args.k - origin_reward.size(1)
         if gap != 0:
-            origin_reward = th.cat([origin_reward, th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).cuda()], dim=1)
+            origin_reward = th.cat(
+                [
+                    origin_reward,
+                    th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).cuda(),
+                ],
+                dim=1,
+            )
         origin_reward = origin_reward.view(origin_reward.size(0), -1, self.args.k, 1)
         if not self.args.mean_weight:
             origin_reward[origin_reward == 0] = -9999999
@@ -372,6 +370,8 @@ class HAVENLearner:
         origin_reward_weight = th.softmax(origin_reward, dim=-2)
         intrinsic_reward = intrinsic_reward * origin_reward_weight
         intrinsic_reward = intrinsic_reward.view(intrinsic_reward.size(0), -1, 1 if self.args.mixer is not None else self.args.n_agents)
-        intrinsic_reward = (intrinsic_reward[:, :batch.max_seq_length-1] * mask).detach()
-        intrinsic_reward = self.args.intrinsic_switch * intrinsic_reward + self.args.reward_switch * batch["reward"][:, :batch.max_seq_length-1]
+        intrinsic_reward = (intrinsic_reward[:, : batch.max_seq_length - 1] * mask).detach()
+        intrinsic_reward = (
+            self.args.intrinsic_switch * intrinsic_reward + self.args.reward_switch * batch["reward"][:, : batch.max_seq_length - 1]
+        )
         return intrinsic_reward

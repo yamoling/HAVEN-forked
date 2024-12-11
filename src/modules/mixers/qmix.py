@@ -22,12 +22,12 @@ class QMixer(nn.Module):
             self.hyper_w_final = nn.Linear(self.state_dim, self.embed_dim)
         elif getattr(args, "hypernet_layers", 1) == 2:
             hypernet_embed = self.args.hypernet_embed
-            self.hyper_w_1 = nn.Sequential(nn.Linear(self.state_dim, hypernet_embed),
-                                           nn.ReLU(),
-                                           nn.Linear(hypernet_embed, self.embed_dim * self.n_agents))
-            self.hyper_w_final = nn.Sequential(nn.Linear(self.state_dim, hypernet_embed),
-                                           nn.ReLU(),
-                                           nn.Linear(hypernet_embed, self.embed_dim))
+            self.hyper_w_1 = nn.Sequential(
+                nn.Linear(self.state_dim, hypernet_embed), nn.ReLU(), nn.Linear(hypernet_embed, self.embed_dim * self.n_agents)
+            )
+            self.hyper_w_final = nn.Sequential(
+                nn.Linear(self.state_dim, hypernet_embed), nn.ReLU(), nn.Linear(hypernet_embed, self.embed_dim)
+            )
         elif getattr(args, "hypernet_layers", 1) > 2:
             raise Exception("Sorry >2 hypernet layers is not implemented!")
         else:
@@ -37,11 +37,9 @@ class QMixer(nn.Module):
         self.hyper_b_1 = nn.Linear(self.state_dim, self.embed_dim)
 
         # V(s) instead of a bias for the last layers
-        self.V = nn.Sequential(nn.Linear(self.state_dim, self.embed_dim),
-                               nn.ReLU(),
-                               nn.Linear(self.embed_dim, 1))
+        self.V = nn.Sequential(nn.Linear(self.state_dim, self.embed_dim), nn.ReLU(), nn.Linear(self.embed_dim, 1))
 
-    def forward(self, agent_qs, states):
+    def forward(self, agent_qs, states) -> th.Tensor:
         bs = agent_qs.size(0)
         states = states.reshape(-1, self.state_dim)
         agent_qs = agent_qs.reshape(-1, 1, self.n_agents)
@@ -61,3 +59,6 @@ class QMixer(nn.Module):
         # Reshape and return
         q_tot = y.view(bs, -1, 1)
         return q_tot
+
+    def __call__(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)

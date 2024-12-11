@@ -1,7 +1,8 @@
 from modules.agents import REGISTRY as agent_REGISTRY
 from components.action_selectors import REGISTRY as action_REGISTRY
 import torch as th
-import numpy as np
+import math
+
 
 # This multi-agent controller shares parameters between agents
 class BasicMAC:
@@ -30,7 +31,6 @@ class BasicMAC:
 
         # Softmax the agent outputs if they're policy logits
         if self.agent_output_type == "pi_logits":
-
             if getattr(self.args, "mask_before_softmax", True):
                 # Make the logits for unavailable actions very negative to minimise their affect on the softmax
                 reshaped_avail_actions = avail_actions.reshape(ep_batch.batch_size * self.n_agents, -1)
@@ -44,8 +44,9 @@ class BasicMAC:
                     # With probability epsilon, we will pick an available action uniformly
                     epsilon_action_num = reshaped_avail_actions.sum(dim=1, keepdim=True).float()
 
-                agent_outs = ((1 - self.action_selector.epsilon) * agent_outs
-                               + th.ones_like(agent_outs) * self.action_selector.epsilon/epsilon_action_num)
+                agent_outs = (1 - self.action_selector.epsilon) * agent_outs + th.ones_like(
+                    agent_outs
+                ) * self.action_selector.epsilon / epsilon_action_num
 
                 if getattr(self.args, "mask_before_softmax", True):
                     # Zero out the unavailable actions
@@ -54,7 +55,9 @@ class BasicMAC:
         return agent_outs.view(ep_batch.batch_size, self.n_agents, -1)
 
     def init_hidden(self, batch_size):
-        self.hidden_states = self.agent.init_hidden().unsqueeze(0).expand(batch_size, self.n_agents, -1)  # bav
+        self.hidden_states = self.agent.init_hidden()
+        if self.hidden_states is not None:
+            self.hidden_states = self.hidden_states.unsqueeze(0).expand(batch_size, self.n_agents, -1)  # bav
 
     def parameters(self):
         return self.agent.parameters()
@@ -75,28 +78,38 @@ class BasicMAC:
         self.agent = agent_REGISTRY[self.args.agent](input_shape, self.args)
 
     def _build_inputs(self, batch, t):
-        # Assumes homogenous agents with flat observations.
-        # Other MACs might want to e.g. delegate building inputs to each agent
         bs = batch.batch_size
-        inputs = []
-        inputs.append(batch["obs"][:, t])  # b1av
-        inputs.append(batch["subgoals_onehot"][:, t])
+        extras = [batch["subgoals_onehot"][:, t]]
         if self.args.obs_last_action:
             if t == 0:
-                inputs.append(th.zeros_like(batch["actions_onehot"][:, t]))
+                extras.append(th.zeros_like(batch["actions_onehot"][:, t]))
             else:
-                inputs.append(batch["actions_onehot"][:, t-1])
+                extras.append(batch["actions_onehot"][:, t - 1])
         if self.args.obs_agent_id:
-            inputs.append(th.eye(self.n_agents, device=batch.device).unsqueeze(0).expand(bs, -1, -1))
+            extras.append(th.eye(self.n_agents, device=batch.device).unsqueeze(0).expand(bs, -1, -1))
 
-        inputs = th.cat([x.reshape(bs*self.n_agents, -1) for x in inputs], dim=1)
-        return inputs
+        match batch.scheme["obs"]["vshape"]:
+            case int():
+                inputs = [batch["obs"][:, t], *extras]
+                inputs = th.cat([x.reshape(bs * self.n_agents, -1) for x in inputs], dim=1)
+                return inputs
+            case tuple():
+                inputs = th.tensor(batch["obs"][:, t])
+                extras = th.cat(extras, dim=-1)
+                return inputs, extras
+            case _:
+                raise NotImplementedError()
 
     def _get_input_shape(self, scheme):
-        input_shape = scheme["obs"]["vshape"] + np.prod(scheme["subgoals_onehot"]["vshape"])
+        extras_shape = math.prod(scheme["subgoals_onehot"]["vshape"])
         if self.args.obs_last_action:
-            input_shape += scheme["actions_onehot"]["vshape"][0]
+            extras_shape += scheme["actions_onehot"]["vshape"][0]
         if self.args.obs_agent_id:
-            input_shape += self.n_agents
-
-        return input_shape
+            extras_shape += self.n_agents
+        match scheme["obs"]["vshape"]:
+            case int(obs_shape):
+                return obs_shape + extras_shape
+            case tuple(obs_shape):
+                return obs_shape, extras_shape
+            case _:
+                raise NotImplementedError()

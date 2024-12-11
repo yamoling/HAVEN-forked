@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import collections
 from os.path import dirname, abspath
 from copy import deepcopy
 from sacred import Experiment, SETTINGS
@@ -13,7 +12,7 @@ import yaml
 
 from run import run
 
-SETTINGS['CAPTURE_MODE'] = "fd" # set to "no" if you want to see stdout/stderr in console
+SETTINGS["CAPTURE_MODE"] = "fd"  # set to "no" if you want to see stdout/stderr in console
 logger = get_logger()
 
 ex = Experiment("pymarl")
@@ -27,7 +26,7 @@ results_path = os.path.join(dirname(dirname(abspath(__file__))), "results")
 def my_main(_run, _config, _log):
     # Setting the random seed throughout the modules
     config = config_copy(_config)
-    config["seed"] = config['env_args']['seed']
+    config["seed"] = config["env_args"]["seed"]
     np.random.seed(config["seed"])
     th.manual_seed(config["seed"])
     th.cuda.manual_seed(config["seed"])
@@ -49,7 +48,7 @@ def _get_config(params, arg_name, subfolder):
     if config_name is not None:
         with open(os.path.join(os.path.dirname(__file__), "config", subfolder, "{}.yaml".format(config_name)), "r") as f:
             try:
-                config_dict = yaml.load(f)
+                config_dict = yaml.load(f, yaml.FullLoader)
             except yaml.YAMLError as exc:
                 assert False, "{}.yaml error: {}".format(config_name, exc)
         return config_dict
@@ -57,7 +56,7 @@ def _get_config(params, arg_name, subfolder):
 
 def recursive_dict_update(d, u):
     for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, dict):
             d[k] = recursive_dict_update(d.get(k, {}), v)
         else:
             d[k] = v
@@ -73,13 +72,13 @@ def config_copy(config):
         return deepcopy(config)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     params = deepcopy(sys.argv)
 
     # Get the defaults from default.yaml
     with open(os.path.join(os.path.dirname(__file__), "config", "default.yaml"), "r") as f:
         try:
-            config_dict = yaml.load(f)
+            config_dict = yaml.load(f, yaml.FullLoader)
         except yaml.YAMLError as exc:
             assert False, "default.yaml error: {}".format(exc)
 

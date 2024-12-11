@@ -21,6 +21,5 @@ class VALUEAgent(nn.Module):
         x = F.relu(self.fc1(inputs))
         h_in = hidden_state.reshape(-1, self.args.rnn_hidden_dim)
         h = self.rnn(x, h_in)
-        #a = a - a.mean(dim=-1, keepdim=True)
         v = self.fc2(h)
         return v, h
