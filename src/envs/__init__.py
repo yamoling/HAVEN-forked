@@ -17,7 +17,8 @@ def lle_fn(**kwargs):
     level = int(kwargs.get("level", 6))
     obs_type = kwargs.get("obs_type", "layered")
     state_type = kwargs.get("state_type", "flattened")
-    env = LLE.level(level).obs_type(obs_type).state_type(state_type).single_objective()
+    # env = LLE.level(level).obs_type(obs_type).state_type(state_type).single_objective()
+    env = LLE.from_file("map.toml").obs_type(obs_type).state_type(state_type).single_objective()
     env = marlenv.adapters.PymarlAdapter(env, 78)
     return env
 

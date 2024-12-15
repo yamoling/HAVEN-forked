@@ -25,8 +25,12 @@ results_path = os.path.join(dirname(dirname(abspath(__file__))), "results")
 @ex.main
 def my_main(_run, _config, _log):
     # Setting the random seed throughout the modules
+    from time import time
+
+    print(_config)
     config = config_copy(_config)
-    config["seed"] = config["env_args"]["seed"]
+    # config["seed"] = config["env_args"]["seed"]
+    config["seed"] = int(time() * 1000) % 1000000
     np.random.seed(config["seed"])
     th.manual_seed(config["seed"])
     th.cuda.manual_seed(config["seed"])
