@@ -12,11 +12,14 @@ def env_fn(env, **kwargs) -> MultiAgentEnv:
 
 
 def lle_fn(**kwargs):
-    map_file: str = kwargs["map"]
-    if map_file.isnumeric():
-        env = LLE.level(int(map_file))
-    else:
-        env = LLE.from_file(map_file)
+    match kwargs["map"]:
+        case str(map_file):
+            env = LLE.from_file(map_file)
+        case int(level):
+            env = LLE.level(level)
+        case other:
+            raise ValueError(f"Invalid map: {other}")
+
     obs_type = kwargs.get("obs_type", "layered")
     state_type = kwargs.get("state_type", "flattened")
     env = env.obs_type(obs_type).state_type(state_type).single_objective()

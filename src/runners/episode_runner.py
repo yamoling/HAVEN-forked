@@ -5,7 +5,6 @@ import numpy as np
 import warnings
 
 warnings.filterwarnings("ignore")
-import torch as th
 
 
 class EpisodeRunner:

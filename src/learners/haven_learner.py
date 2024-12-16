@@ -23,32 +23,33 @@ class HAVENLearner:
         self.last_target_macro_update_episode = 0
         self.last_target_value_update_episode = 0
 
-        self.mixer = None
-        if args.mixer is not None:
-            if args.mixer == "vdn":
+        match args.mixer:
+            case "vdn":
                 self.mixer = VDNMixer()
-            elif args.mixer == "qmix":
+            case "qmix":
                 self.mixer = QMixer(args)
-            else:
-                raise ValueError("Mixer {} not recognised.".format(args.mixer))
-            self.params += list(self.mixer.parameters())
-            self.target_mixer = copy.deepcopy(self.mixer)
+            case other:
+                raise ValueError(f"Mixer {other} not recognised.")
+        self.params += list(self.mixer.parameters())
+        self.target_mixer = copy.deepcopy(self.mixer)
 
-        if args.value_mixer == "vdn":
-            self.value_mixer = VDNMixer()
-        elif args.value_mixer == "qmix":
-            self.value_mixer = QMixer(args)
-        else:
-            raise ValueError("Mixer {} not recognised.".format(args.value_mixer))
+        match args.value_mixer:
+            case "vdn":
+                self.value_mixer = VDNMixer()
+            case "qmix":
+                self.value_mixer = QMixer(args)
+            case other:
+                raise ValueError(f"Mixer {other} not recognised.")
         self.value_params += list(self.value_mixer.parameters())
         self.target_value_mixer = copy.deepcopy(self.value_mixer)
 
-        if args.macro_mixer == "vdn":
-            self.macro_mixer = VDNMixer()
-        elif args.macro_mixer == "qmix":
-            self.macro_mixer = QMixer(args)
-        else:
-            raise ValueError("Mixer {} not recognised.".format(args.macro_mixer))
+        match args.macro_mixer:
+            case "vdn":
+                self.macro_mixer = VDNMixer()
+            case "qmix":
+                self.macro_mixer = QMixer(args)
+            case other:
+                raise ValueError(f"Mixer {other} not recognised.")
         self.macro_params += list(self.macro_mixer.parameters())
         self.target_macro_mixer = copy.deepcopy(self.macro_mixer)
 
@@ -150,9 +151,8 @@ class HAVENLearner:
             target_max_qvals = target_mac_out.max(dim=3)[0]
 
         # Mix
-        if self.mixer is not None:
-            chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
-            target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
+        chosen_action_qvals = self.mixer(chosen_action_qvals, batch["state"][:, :-1])
+        target_max_qvals = self.target_mixer(target_max_qvals, batch["state"][:, 1:])
 
         # Calculate 1-step Q-Learning targets
         targets = intrinsic_reward + self.args.gamma * (1 - terminated) * target_max_qvals
@@ -257,8 +257,7 @@ class HAVENLearner:
 
     def _update_targets(self):
         self.target_mac.load_state(self.mac)
-        if self.mixer is not None:
-            self.target_mixer.load_state_dict(self.mixer.state_dict())
+        self.target_mixer.load_state_dict(self.mixer.state_dict())
         self.logger.console_logger.info("Updated target network")
 
     def _update_macro_targets(self):
@@ -352,7 +351,8 @@ class HAVENLearner:
         macro_mac_out = self.macro_mixer(macro_mac_out, macro_batch["state"])
 
         # intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
-        intrinsic_reward = macro_batch["macro_reward"][:, :-1] + self.args.gamma * values[:, 1:] - values[:, :-1]
+        macro_reward = macro_batch["macro_reward"][:, :-1]
+        intrinsic_reward = macro_reward + self.args.gamma * values[:, 1:] - values[:, :-1]
         intrinsic_reward = intrinsic_reward.unsqueeze(-2)
         gap = intrinsic_reward.size(1) * self.args.k - origin_reward.size(1)
         if gap != 0:

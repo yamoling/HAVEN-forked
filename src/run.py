@@ -8,6 +8,7 @@ from types import SimpleNamespace as SN
 from utils.logging import Logger
 from utils.timehelper import time_left, time_str
 from os.path import dirname, abspath
+from runners import EpisodeRunner
 
 from learners import REGISTRY as le_REGISTRY
 from runners import REGISTRY as r_REGISTRY
@@ -28,6 +29,8 @@ def run(_run, _config, _log):
         n_devices = th.cuda.device_count()
         seed = args.env_args.get("seed", 0)
         args.device = th.device(f"cuda:{seed % n_devices}")
+    else:
+        args.device = th.device("cpu")
 
     # setup loggers
     logger = Logger(_log)
@@ -84,7 +87,7 @@ def evaluate_sequential(args, runner, buffer, macro_buffer):
 
 def run_sequential(args, logger):
     # Init runner so we can get env info
-    runner = r_REGISTRY[args.runner](args=args, logger=logger)
+    runner: EpisodeRunner = r_REGISTRY[args.runner](args=args, logger=logger)
 
     # Set up schemes and groups here
     env_info = runner.get_env_info()
