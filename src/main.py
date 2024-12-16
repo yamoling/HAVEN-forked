@@ -25,12 +25,9 @@ results_path = os.path.join(dirname(dirname(abspath(__file__))), "results")
 @ex.main
 def my_main(_run, _config, _log):
     # Setting the random seed throughout the modules
-    from time import time
 
-    print(_config)
     config = config_copy(_config)
-    # config["seed"] = config["env_args"]["seed"]
-    config["seed"] = int(time() * 1000) % 1000000
+    config["seed"] = config["env_args"]["seed"]
     np.random.seed(config["seed"])
     th.manual_seed(config["seed"])
     th.cuda.manual_seed(config["seed"])
@@ -67,7 +64,7 @@ def recursive_dict_update(d, u):
     return d
 
 
-def config_copy(config):
+def config_copy(config) -> dict:
     if isinstance(config, dict):
         return {k: config_copy(v) for k, v in config.items()}
     elif isinstance(config, list):
@@ -84,7 +81,7 @@ if __name__ == "__main__":
         try:
             config_dict = yaml.load(f, yaml.FullLoader)
         except yaml.YAMLError as exc:
-            assert False, "default.yaml error: {}".format(exc)
+            assert False, f"default.yaml error: {exc}"
 
     # Load algorithm and env base configs
     env_config = _get_config(params, "--env-config", "envs")

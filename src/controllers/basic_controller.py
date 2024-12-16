@@ -2,19 +2,19 @@ from modules.agents import REGISTRY as agent_REGISTRY
 from components.action_selectors import REGISTRY as action_REGISTRY
 import torch as th
 import math
+from .controller import Controller
 
 
 # This multi-agent controller shares parameters between agents
-class BasicMAC:
+class BasicMAC(Controller):
     def __init__(self, scheme, groups, args):
         self.n_agents = args.n_agents
         self.args = args
         input_shape = self._get_input_shape(scheme)
         self._build_agents(input_shape)
+        super().__init__(self.agent)
         self.agent_output_type = args.agent_output_type
-
         self.action_selector = action_REGISTRY[args.action_selector["type"]](args.action_selector)
-
         self.hidden_states = None
 
     def select_actions(self, ep_batch, t_ep, t_env, bs=slice(None), test_mode=False):
@@ -64,9 +64,6 @@ class BasicMAC:
 
     def load_state(self, other_mac):
         self.agent.load_state_dict(other_mac.agent.state_dict())
-
-    def cuda(self):
-        self.agent.cuda()
 
     def save_models(self, path):
         th.save(self.agent.state_dict(), "{}/agent.th".format(path))

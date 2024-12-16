@@ -50,7 +50,9 @@ class QLearner:
             mac_hidden_states.append(self.mac.hidden_states)
         mac_out = th.stack(mac_out, dim=1)  # Concat over time
         mac_hidden_states = th.stack(mac_hidden_states, dim=1)
-        mac_hidden_states = mac_hidden_states.reshape(batch.batch_size, self.args.n_agents, batch.max_seq_length, -1).transpose(1,2) #btav
+        mac_hidden_states = mac_hidden_states.reshape(batch.batch_size, self.args.n_agents, batch.max_seq_length, -1).transpose(
+            1, 2
+        )  # btav
 
         # Pick the Q-Values for the actions taken by each agent
         chosen_action_qvals = th.gather(mac_out[:, :-1], dim=3, index=actions).squeeze(3)  # Remove the last dim
@@ -67,7 +69,9 @@ class QLearner:
         # We don't need the first timesteps Q-Value estimate for calculating targets
         target_mac_out = th.stack(target_mac_out[:], dim=1)  # Concat across time
         target_mac_hidden_states = th.stack(target_mac_hidden_states, dim=1)
-        target_mac_hidden_states = target_mac_hidden_states.reshape(batch.batch_size, self.args.n_agents, batch.max_seq_length, -1).transpose(1,2) #btav
+        target_mac_hidden_states = target_mac_hidden_states.reshape(
+            batch.batch_size, self.args.n_agents, batch.max_seq_length, -1
+        ).transpose(1, 2)  # btav
 
         # Mask out unavailable actions
         target_mac_out[avail_actions[:, :] == 0] = -9999999  # From OG deepmarl
@@ -82,44 +86,54 @@ class QLearner:
         if self.args.mixer == "qtran_base":
             # -- TD Loss --
             # Joint-action Q-Value estimates
-            joint_qs, vs = self.mixer(batch[:, :-1], mac_hidden_states[:,:-1])
+            joint_qs, vs = self.mixer(batch[:, :-1], mac_hidden_states[:, :-1])
 
             # Need to argmax across the target agents' actions to compute target joint-action Q-Values
             if self.args.double_q:
-                max_actions_current_ = th.zeros(size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device)
+                max_actions_current_ = th.zeros(
+                    size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device
+                )
                 max_actions_current_onehot = max_actions_current_.scatter(3, max_actions_current[:, :], 1)
                 max_actions_onehot = max_actions_current_onehot
             else:
-                max_actions = th.zeros(size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device)
+                max_actions = th.zeros(
+                    size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device
+                )
                 max_actions_onehot = max_actions.scatter(3, target_max_actions[:, :], 1)
-            target_joint_qs, target_vs = self.target_mixer(batch[:, 1:], hidden_states=target_mac_hidden_states[:,1:], actions=max_actions_onehot[:,1:])
+            target_joint_qs, target_vs = self.target_mixer(
+                batch[:, 1:], hidden_states=target_mac_hidden_states[:, 1:], actions=max_actions_onehot[:, 1:]
+            )
 
             # Td loss targets
-            td_targets = rewards.reshape(-1,1) + self.args.gamma * (1 - terminated.reshape(-1, 1)) * target_joint_qs
-            td_error = (joint_qs - td_targets.detach())
+            td_targets = rewards.reshape(-1, 1) + self.args.gamma * (1 - terminated.reshape(-1, 1)) * target_joint_qs
+            td_error = joint_qs - td_targets.detach()
             masked_td_error = td_error * mask.reshape(-1, 1)
-            td_loss = (masked_td_error ** 2).sum() / mask.sum()
+            td_loss = (masked_td_error**2).sum() / mask.sum()
             # -- TD Loss --
 
             # -- Opt Loss --
             # Argmax across the current agents' actions
-            if not self.args.double_q: # Already computed if we're doing double Q-Learning
-                max_actions_current_ = th.zeros(size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device )
+            if not self.args.double_q:  # Already computed if we're doing double Q-Learning
+                max_actions_current_ = th.zeros(
+                    size=(batch.batch_size, batch.max_seq_length, self.args.n_agents, self.args.n_actions), device=batch.device
+                )
                 max_actions_current_onehot = max_actions_current_.scatter(3, max_actions_current[:, :], 1)
-            max_joint_qs, _ = self.mixer(batch[:, :-1], mac_hidden_states[:,:-1], actions=max_actions_current_onehot[:,:-1]) # Don't use the target network and target agent max actions as per author's email
+            max_joint_qs, _ = self.mixer(
+                batch[:, :-1], mac_hidden_states[:, :-1], actions=max_actions_current_onehot[:, :-1]
+            )  # Don't use the target network and target agent max actions as per author's email
 
             # max_actions_qvals = th.gather(mac_out[:, :-1], dim=3, index=max_actions_current[:,:-1])
-            opt_error = max_actions_qvals[:,:-1].sum(dim=2).reshape(-1, 1) - max_joint_qs.detach() + vs
+            opt_error = max_actions_qvals[:, :-1].sum(dim=2).reshape(-1, 1) - max_joint_qs.detach() + vs
             masked_opt_error = opt_error * mask.reshape(-1, 1)
-            opt_loss = (masked_opt_error ** 2).sum() / mask.sum()
+            opt_loss = (masked_opt_error**2).sum() / mask.sum()
             # -- Opt Loss --
 
             # -- Nopt Loss --
             # target_joint_qs, _ = self.target_mixer(batch[:, :-1])
-            nopt_values = chosen_action_qvals.sum(dim=2).reshape(-1, 1) - joint_qs.detach() + vs # Don't use target networks here either
+            nopt_values = chosen_action_qvals.sum(dim=2).reshape(-1, 1) - joint_qs.detach() + vs  # Don't use target networks here either
             nopt_error = nopt_values.clamp(max=0)
             masked_nopt_error = nopt_error * mask.reshape(-1, 1)
-            nopt_loss = (masked_nopt_error ** 2).sum() / mask.sum()
+            nopt_loss = (masked_nopt_error**2).sum() / mask.sum()
             # -- Nopt loss --
 
         elif self.args.mixer == "qtran_alt":
@@ -145,11 +159,13 @@ class QLearner:
             self.logger.log_stat("grad_norm", grad_norm, t_env)
             if self.args.mixer == "qtran_base":
                 mask_elems = mask.sum().item()
-                self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item()/mask_elems), t_env)
-                self.logger.log_stat("td_targets", ((masked_td_error).sum().item()/mask_elems), t_env)
-                self.logger.log_stat("td_chosen_qs", (joint_qs.sum().item()/mask_elems), t_env)
-                self.logger.log_stat("v_mean", (vs.sum().item()/mask_elems), t_env)
-                self.logger.log_stat("agent_indiv_qs", ((chosen_action_qvals * mask).sum().item()/(mask_elems * self.args.n_agents)), t_env)
+                self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item() / mask_elems), t_env)
+                self.logger.log_stat("td_targets", ((masked_td_error).sum().item() / mask_elems), t_env)
+                self.logger.log_stat("td_chosen_qs", (joint_qs.sum().item() / mask_elems), t_env)
+                self.logger.log_stat("v_mean", (vs.sum().item() / mask_elems), t_env)
+                self.logger.log_stat(
+                    "agent_indiv_qs", ((chosen_action_qvals * mask).sum().item() / (mask_elems * self.args.n_agents)), t_env
+                )
             self.log_stats_t = t_env
 
     def _update_targets(self):
@@ -158,12 +174,12 @@ class QLearner:
             self.target_mixer.load_state_dict(self.mixer.state_dict())
         self.logger.console_logger.info("Updated target network")
 
-    def cuda(self):
-        self.mac.cuda()
-        self.target_mac.cuda()
+    def to(self, device):
+        self.mac.to(device)
+        self.target_mac.to(device)
         if self.mixer is not None:
-            self.mixer.cuda()
-            self.target_mixer.cuda()
+            self.mixer.to(device)
+            self.target_mixer.to(device)
 
     def save_models(self, path):
         self.mac.save_models(path)

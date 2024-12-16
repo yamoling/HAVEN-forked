@@ -44,10 +44,9 @@ class COMALearner:
 
         mask = mask.repeat(1, 1, self.n_agents).view(-1)
 
-        q_vals, critic_train_stats = self._train_critic(batch, rewards, terminated, actions, avail_actions,
-                                                        critic_mask, bs, max_t)
+        q_vals, critic_train_stats = self._train_critic(batch, rewards, terminated, actions, avail_actions, critic_mask, bs, max_t)
 
-        actions = actions[:,:-1]
+        actions = actions[:, :-1]
 
         mac_out = []
         self.mac.init_hidden(batch.batch_size)
@@ -58,7 +57,7 @@ class COMALearner:
 
         # Mask out unavailable actions, renormalise (as in action selection)
         mac_out[avail_actions == 0] = 0
-        mac_out = mac_out/mac_out.sum(dim=-1, keepdim=True)
+        mac_out = mac_out / mac_out.sum(dim=-1, keepdim=True)
         mac_out[avail_actions == 0] = 0
 
         # Calculated baseline
@@ -74,7 +73,7 @@ class COMALearner:
 
         advantages = (q_taken - baseline).detach()
 
-        coma_loss = - ((advantages * log_pi_taken) * mask).sum() / mask.sum()
+        coma_loss = -((advantages * log_pi_taken) * mask).sum() / mask.sum()
 
         # Optimise agents
         self.agent_optimiser.zero_grad()
@@ -89,7 +88,7 @@ class COMALearner:
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
             ts_logged = len(critic_train_stats["critic_loss"])
             for key in ["critic_loss", "critic_grad_norm", "td_error_abs", "q_taken_mean", "target_mean"]:
-                self.logger.log_stat(key, sum(critic_train_stats[key])/ts_logged, t_env)
+                self.logger.log_stat(key, sum(critic_train_stats[key]) / ts_logged, t_env)
 
             self.logger.log_stat("advantage_mean", (advantages * mask).sum().item() / mask.sum().item(), t_env)
             self.logger.log_stat("coma_loss", coma_loss.item(), t_env)
@@ -122,16 +121,16 @@ class COMALearner:
 
             q_t = self.critic(batch, t)
             q_vals[:, t] = q_t.view(bs, self.n_agents, self.n_actions)
-            q_taken = th.gather(q_t, dim=3, index=actions[:, t:t+1]).squeeze(3).squeeze(1)
+            q_taken = th.gather(q_t, dim=3, index=actions[:, t : t + 1]).squeeze(3).squeeze(1)
             targets_t = targets[:, t]
 
-            td_error = (q_taken - targets_t.detach())
+            td_error = q_taken - targets_t.detach()
 
             # 0-out the targets that came from padded data
             masked_td_error = td_error * mask_t
 
             # Normal L2 loss, take mean over actual data
-            loss = (masked_td_error ** 2).sum() / mask_t.sum()
+            loss = (masked_td_error**2).sum() / mask_t.sum()
             self.critic_optimiser.zero_grad()
             loss.backward()
             grad_norm = th.nn.utils.clip_grad_norm_(self.critic_params, self.args.grad_norm_clip)
@@ -151,10 +150,10 @@ class COMALearner:
         self.target_critic.load_state_dict(self.critic.state_dict())
         self.logger.console_logger.info("Updated target network")
 
-    def cuda(self):
-        self.mac.cuda()
-        self.critic.cuda()
-        self.target_critic.cuda()
+    def to(self, device):
+        self.mac.to(device)
+        self.critic.to(device)
+        self.target_critic.to(device)
 
     def save_models(self, path):
         self.mac.save_models(path)

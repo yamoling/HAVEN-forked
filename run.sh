@@ -1,13 +1,6 @@
 #!/bin/bash
 
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
-sleep 9h
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
-sleep 9h
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
-python src/main.py --env-config=lle --config=haven-cnn &
+for i in {0..15}; do
+    python src/main.py --env-config=lle --config=haven-cnn with env_args.seed=${i} &
+done
+

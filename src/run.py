@@ -8,8 +8,6 @@ from types import SimpleNamespace as SN
 from utils.logging import Logger
 from utils.timehelper import time_left, time_str
 from os.path import dirname, abspath
-import numpy as np
-from sklearn.cluster import MiniBatchKMeans
 
 from learners import REGISTRY as le_REGISTRY
 from runners import REGISTRY as r_REGISTRY
@@ -24,7 +22,12 @@ def run(_run, _config, _log):
     _config = args_sanity_check(_config, _log)
 
     args = SN(**_config)
-    args.device = "cuda" if args.use_cuda else "cpu"
+    if not th.cuda.is_available():
+        args.use_cuda = False
+    if args.use_cuda:
+        n_devices = th.cuda.device_count()
+        seed = args.env_args["seed"]
+        args.device = th.device(f"cuda:{seed % n_devices}")
 
     # setup loggers
     logger = Logger(_log)
@@ -156,7 +159,7 @@ def run_sequential(args, logger):
     )
 
     if args.use_cuda:
-        learner.cuda()
+        learner.to(args.device)
 
     if args.checkpoint_path != "":
         timesteps = []

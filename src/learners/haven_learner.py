@@ -13,6 +13,7 @@ class HAVENLearner:
         self.macro_mac = macro_mac
         self.value_mac = value_mac
         self.logger = logger
+        self.device = th.device("cpu")
 
         self.params = list(mac.parameters())
         self.macro_params = list(macro_mac.parameters())
@@ -272,22 +273,23 @@ class HAVENLearner:
             self.target_value_mixer.load_state_dict(self.value_mixer.state_dict())
         self.logger.console_logger.info("Updated target value network")
 
-    def cuda(self):
-        self.mac.cuda()
-        self.target_mac.cuda()
-        self.macro_mac.cuda()
-        self.target_macro_mac.cuda()
-        self.value_mac.cuda()
-        self.target_value_mac.cuda()
+    def to(self, device: th.device):
+        self.device = device
+        self.mac.to(device)
+        self.target_mac.to(device)
+        self.macro_mac.to(device)
+        self.target_macro_mac.to(device)
+        self.value_mac.to(device)
+        self.target_value_mac.to(device)
         if self.mixer is not None:
-            self.mixer.cuda()
-            self.target_mixer.cuda()
+            self.mixer.to(device)
+            self.target_mixer.to(device)
         if self.macro_mixer is not None:
-            self.macro_mixer.cuda()
-            self.target_macro_mixer.cuda()
+            self.macro_mixer.to(device)
+            self.target_macro_mixer.to(device)
         if self.value_mixer is not None:
-            self.value_mixer.cuda()
-            self.target_value_mixer.cuda()
+            self.value_mixer.to(device)
+            self.target_value_mixer.to(device)
 
     def save_models(self, path):
         self.mac.save_models(path)
@@ -357,7 +359,7 @@ class HAVENLearner:
             origin_reward = th.cat(
                 [
                     origin_reward,
-                    th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).cuda(),
+                    th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).to(self.device),
                 ],
                 dim=1,
             )

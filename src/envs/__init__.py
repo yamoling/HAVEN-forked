@@ -5,8 +5,6 @@ import marlenv
 from lle import LLE
 
 # from .grf import Academy_3_vs_1_with_Keeper, Academy_Pass_and_Shoot_with_Keeper, Academy_Run_Pass_and_Shoot_with_Keeper, Academy_Corner
-import sys
-import os
 
 
 def env_fn(env, **kwargs) -> MultiAgentEnv:
@@ -14,13 +12,20 @@ def env_fn(env, **kwargs) -> MultiAgentEnv:
 
 
 def lle_fn(**kwargs):
-    level = int(kwargs.get("level", 6))
+    map_file: str = kwargs["map"]
+    if map_file.isnumeric():
+        env = LLE.level(int(map_file))
+    else:
+        env = LLE.from_file(map_file)
     obs_type = kwargs.get("obs_type", "layered")
     state_type = kwargs.get("state_type", "flattened")
-    # env = LLE.level(level).obs_type(obs_type).state_type(state_type).single_objective()
-    env = LLE.from_file("map.toml").obs_type(obs_type).state_type(state_type).single_objective()
-    env = marlenv.adapters.PymarlAdapter(env, 78)
-    return env
+    env = env.obs_type(obs_type).state_type(state_type).single_objective()
+    seed = kwargs.get("seed", None)
+    if seed is not None:
+        seed = int(seed)
+        env.seed(seed)
+    time_limit = env.width * env.height // 2
+    return marlenv.adapters.PymarlAdapter(env, time_limit)
 
 
 REGISTRY = {

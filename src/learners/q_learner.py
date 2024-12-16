@@ -86,7 +86,7 @@ class QLearner:
         targets = rewards + self.args.gamma * (1 - terminated) * target_max_qvals
 
         # Td-error
-        td_error = (chosen_action_qvals - targets.detach())
+        td_error = chosen_action_qvals - targets.detach()
 
         mask = mask.expand_as(td_error)
 
@@ -94,7 +94,7 @@ class QLearner:
         masked_td_error = td_error * mask
 
         # Normal L2 loss, take mean over actual data
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error**2).sum() / mask.sum()
 
         # Optimise
         self.optimiser.zero_grad()
@@ -110,9 +110,9 @@ class QLearner:
             self.logger.log_stat("loss", loss.item(), t_env)
             self.logger.log_stat("grad_norm", grad_norm, t_env)
             mask_elems = mask.sum().item()
-            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item()/mask_elems), t_env)
-            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
-            self.logger.log_stat("target_mean", (targets * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
+            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item() / mask_elems), t_env)
+            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
+            self.logger.log_stat("target_mean", (targets * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
             self.log_stats_t = t_env
 
     def _update_targets(self):
@@ -121,12 +121,12 @@ class QLearner:
             self.target_mixer.load_state_dict(self.mixer.state_dict())
         self.logger.console_logger.info("Updated target network")
 
-    def cuda(self):
-        self.mac.cuda()
-        self.target_mac.cuda()
+    def to(self, device):
+        self.mac.to(device)
+        self.target_mac.to(device)
         if self.mixer is not None:
-            self.mixer.cuda()
-            self.target_mixer.cuda()
+            self.mixer.to(device)
+            self.target_mixer.to(device)
 
     def save_models(self, path):
         self.mac.save_models(path)
