@@ -26,7 +26,7 @@ def run(_run, _config, _log):
         args.use_cuda = False
     if args.use_cuda:
         n_devices = th.cuda.device_count()
-        seed = args.env_args["seed"]
+        seed = args.env_args.get("seed", 0)
         args.device = th.device(f"cuda:{seed % n_devices}")
 
     # setup loggers
