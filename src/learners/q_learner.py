@@ -7,7 +7,7 @@ from torch.optim import RMSprop
 
 
 class QLearner:
-    def __init__(self, mac, scheme, logger, args):
+    def __init__(self, mac, macro_mac, value_mac, scheme, logger, args):
         self.args = args
         self.mac = mac
         self.logger = logger
@@ -34,7 +34,7 @@ class QLearner:
 
         self.log_stats_t = -self.args.learner_log_interval - 1
 
-    def train(self, batch: EpisodeBatch, t_env: int, episode_num: int):
+    def train(self, batch: EpisodeBatch, _marco_batch, t_env: int, episode_num: int):
         # Get the relevant quantities
         rewards = batch["reward"][:, :-1]
         actions = batch["actions"][:, :-1]

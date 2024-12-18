@@ -32,15 +32,18 @@ class EpisodeRunner:
         self.new_batch = partial(
             EpisodeBatch, scheme, groups, self.batch_size, self.episode_limit + 1, preprocess=preprocess, device=self.args.device
         )
-        self.new_macro_batch = partial(
-            EpisodeBatch,
-            macro_scheme,
-            groups,
-            self.batch_size,
-            (self.episode_limit // self.args.k) + 1 + (self.episode_limit % self.args.k != 0),
-            preprocess=macro_preprocess,
-            device=self.args.device,
-        )
+        if hasattr(self.args, "k"):
+            self.new_macro_batch = partial(
+                EpisodeBatch,
+                macro_scheme,
+                groups,
+                self.batch_size,
+                (self.episode_limit // self.args.k) + 1 + (self.episode_limit % self.args.k != 0),
+                preprocess=macro_preprocess,
+                device=self.args.device,
+            )
+        else:
+            self.new_macro_batch = lambda: None
         self.mac = mac
         self.macro_mac = macro_mac
         self.value_mac = value_mac
@@ -67,8 +70,10 @@ class EpisodeRunner:
         terminated = False
         episode_return = 0
         self.mac.init_hidden(batch_size=self.batch_size)
-        self.macro_mac.init_hidden(batch_size=self.batch_size)
-        self.value_mac.init_hidden(batch_size=self.batch_size)
+        if self.macro_mac is not None:
+            self.macro_mac.init_hidden(batch_size=self.batch_size)
+        if self.value_mac is not None:
+            self.value_mac.init_hidden(batch_size=self.batch_size)
         env_info = {"alive_allies_list": [1 for _ in range(self.args.n_agents)]}
 
         macro_reward = 0
@@ -80,7 +85,7 @@ class EpisodeRunner:
             }
             self.batch.update(pre_transition_data, ts=self.t)
 
-            if self.t % self.args.k == 0:
+            if self.macro_batch is not None and self.t % self.args.k == 0:
                 pre_macro_transition_data = {
                     "state": [self.env.get_state()],
                     "obs": [self.env.get_obs()],
@@ -89,17 +94,20 @@ class EpisodeRunner:
 
             # Pass the entire batch of experiences up till now to the agents
             # Receive the actions for each agent at this timestep in a batch of size 1
-            if self.t % self.args.k == 0 and self.t != 0:
+            if self.macro_batch is not None and self.t % self.args.k == 0 and self.t != 0:
                 post_macro_transition_data = {"macro_actions": macro_actions, "macro_reward": [(macro_reward,)], "terminated": [(False,)]}  # noqa: F821
                 macro_reward = 0
                 self.macro_batch.update(post_macro_transition_data, ts=self.t // self.args.k - 1)
-            if self.t % self.args.k == 0:
+            if self.macro_batch is not None and self.t % self.args.k == 0:
                 macro_actions = self.macro_mac.select_actions(
                     self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
                 )
-            pre_transition_data = {
-                "subgoals": macro_actions,
-            }
+            if self.macro_batch is not None:
+                pre_transition_data = {
+                    "subgoals": macro_actions,
+                }
+            else:
+                pre_transition_data = {}
             self.batch.update(pre_transition_data, ts=self.t)
             actions = self.mac.select_actions(self.batch, t_ep=self.t, t_env=self.t_env, test_mode=test_mode)
 
@@ -116,36 +124,38 @@ class EpisodeRunner:
             self.batch.update(post_transition_data, ts=self.t)
 
             self.t += 1
-
-        post_macro_transition_data = {
-            "macro_actions": macro_actions,
-            "macro_reward": [(macro_reward,)],
-            "terminated": [(terminated != env_info.get("episode_limit", False),)],
-        }
-        # macro_index = (self.t - 1) // self.args.k if ((self.t - 1) % self.args.k) == 0 else (self.t - 1) // self.args.k + 1
-        macro_index = (self.t - 1) // self.args.k
-        self.macro_batch.update(post_macro_transition_data, ts=macro_index)
+        if self.macro_batch is not None:
+            post_macro_transition_data = {
+                "macro_actions": macro_actions,
+                "macro_reward": [(macro_reward,)],
+                "terminated": [(terminated != env_info.get("episode_limit", False),)],
+            }
+            # macro_index = (self.t - 1) // self.args.k if ((self.t - 1) % self.args.k) == 0 else (self.t - 1) // self.args.k + 1
+            macro_index = (self.t - 1) // self.args.k
+            self.macro_batch.update(post_macro_transition_data, ts=macro_index)
+            last_macro_data = {
+                "state": [self.env.get_state()],
+                "obs": [self.env.get_obs()],
+            }
+            self.macro_batch.update(last_macro_data, ts=macro_index + 1)
         last_data = {
             "state": [self.env.get_state()],
             "avail_actions": [self.env.get_avail_actions()],
             "obs": [self.env.get_obs()],
         }
-
-        last_macro_data = {
-            "state": [self.env.get_state()],
-            "obs": [self.env.get_obs()],
-        }
         self.batch.update(last_data, ts=self.t)
-        self.macro_batch.update(last_macro_data, ts=macro_index + 1)
 
         # Select actions in the last stored state
-        macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
-        pre_transition_data = {
-            "subgoals": macro_actions,
-        }
+        if self.macro_mac is not None and self.macro_batch is not None:
+            macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
+            pre_transition_data = {
+                "subgoals": macro_actions,
+            }
+            self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index + 1)
+        else:
+            pre_transition_data = {}
         self.batch.update(pre_transition_data, ts=self.t)
         actions = self.mac.select_actions(self.batch, t_ep=self.t, t_env=self.t_env, test_mode=test_mode)
-        self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index + 1)
         self.batch.update({"actions": actions}, ts=self.t)
 
         cur_stats = self.test_stats if test_mode else self.train_stats

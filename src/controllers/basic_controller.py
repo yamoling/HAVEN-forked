@@ -1,5 +1,5 @@
 from modules.agents import REGISTRY as agent_REGISTRY
-from components.action_selectors import REGISTRY as action_REGISTRY
+from components.action_selectors import REGISTRY as action_REGISTRY, EpsilonGreedyActionSelector
 import torch as th
 import math
 from .controller import Controller
@@ -14,6 +14,7 @@ class BasicMAC(Controller):
         self._build_agents(input_shape)
         super().__init__(self.agent)
         self.agent_output_type = args.agent_output_type
+        print(args.action_selector)
         self.action_selector = action_REGISTRY[args.action_selector["type"]](args.action_selector)
         self.hidden_states = None
 
@@ -76,7 +77,10 @@ class BasicMAC(Controller):
 
     def _build_inputs(self, batch, t):
         bs = batch.batch_size
-        extras = [batch["subgoals_onehot"][:, t]]
+        extras = []
+        if "subgoals_onehot" in batch.scheme:
+            extras.append(batch["subgoals_onehot"][:, t])
+
         if self.args.obs_last_action:
             if t == 0:
                 extras.append(th.zeros_like(batch["actions_onehot"][:, t]))
@@ -98,7 +102,10 @@ class BasicMAC(Controller):
                 raise NotImplementedError()
 
     def _get_input_shape(self, scheme):
-        extras_shape = math.prod(scheme["subgoals_onehot"]["vshape"])
+        if "subgoals_onehot" in scheme:
+            extras_shape = math.prod(scheme["subgoals_onehot"]["vshape"])
+        else:
+            extras_shape = 0
         if self.args.obs_last_action:
             extras_shape += scheme["actions_onehot"]["vshape"][0]
         if self.args.obs_agent_id:

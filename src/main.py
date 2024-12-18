@@ -95,7 +95,15 @@ if __name__ == "__main__":
 
     # Save to disk by default for sacred
     logger.info("Saving to FileStorageObserver in results/sacred.")
-    file_obs_path = os.path.join(results_path, "sacred")
+    env_name = config_dict["env"]
+    env_args = config_dict["env_args"]
+    if "map_name" in env_args:
+        env_name = env_name + "_" + env_args["map_name"]
+    elif "map" in env_args:
+        env_name = env_name + "_" + str(env_args["map"])
+    algo_name = config_dict["name"]
+    env_name = env_name + "_" + algo_name
+    file_obs_path = os.path.join(results_path, env_name)
     ex.observers.append(FileStorageObserver.create(file_obs_path))
 
     ex.run_commandline(params)

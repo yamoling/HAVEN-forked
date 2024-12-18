@@ -118,9 +118,11 @@ def run_sequential(args, logger):
     groups = {"agents": args.n_agents}
     preprocess = {
         "actions": ("actions_onehot", [OneHot(out_dim=args.n_actions)]),
-        "subgoals": ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)]),
     }
-    macro_preprocess = {"macro_actions": ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])}
+    macro_preprocess = {}
+    if hasattr(args, "n_subgoals"):
+        preprocess["subgoals"] = ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)])
+        macro_preprocess["macro_actions"] = ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])
 
     buffer = ReplayBuffer(
         scheme,
@@ -131,19 +133,24 @@ def run_sequential(args, logger):
         device="cpu" if args.buffer_cpu_only else args.device,
     )
 
-    macro_buffer = ReplayBuffer(
-        macro_scheme,
-        groups,
-        args.buffer_size,
-        (env_info["episode_limit"] // args.k) + 1 + (env_info["episode_limit"] % args.k != 0),
-        preprocess=macro_preprocess,
-        device="cpu" if args.buffer_cpu_only else args.device,
-    )
+    if hasattr(args, "n_subgoals"):
+        macro_buffer = ReplayBuffer(
+            macro_scheme,
+            groups,
+            args.buffer_size,
+            (env_info["episode_limit"] // args.k) + 1 + (env_info["episode_limit"] % args.k != 0),
+            preprocess=macro_preprocess,
+            device="cpu" if args.buffer_cpu_only else args.device,
+        )
+        macro_mac = mac_REGISTRY[args.macro_mac](macro_buffer.scheme, groups, args)
+        value_mac = mac_REGISTRY["value_mac"](macro_buffer.scheme, groups, args)
+    else:
+        macro_buffer = None
+        macro_mac = None
+        value_mac = None
 
     # Setup multiagent controller here
     mac = mac_REGISTRY[args.mac](buffer.scheme, groups, args)
-    macro_mac = mac_REGISTRY[args.macro_mac](macro_buffer.scheme, groups, args)
-    value_mac = mac_REGISTRY["value_mac"](macro_buffer.scheme, groups, args)
 
     # Learner
     learner = le_REGISTRY[args.learner](mac, macro_mac, value_mac, buffer.scheme, logger, args)
@@ -206,24 +213,25 @@ def run_sequential(args, logger):
     last_time = start_time
 
     logger.console_logger.info("Beginning training for {} timesteps".format(args.t_max))
-
+    ep_ids = None
     while runner.t_env <= args.t_max:
         # Run for a whole episode at a time
         episode_batch, macro_episode_batch = runner.run(test_mode=False)
         buffer.insert_episode_batch(episode_batch)
-        macro_buffer.insert_episode_batch(macro_episode_batch)
+        if macro_buffer is not None:
+            macro_buffer.insert_episode_batch(macro_episode_batch)
 
-        if macro_buffer.can_sample(args.batch_size):
-            episode_sample, ep_ids = macro_buffer.sample(args.batch_size)
+            if macro_buffer.can_sample(args.batch_size):
+                episode_sample, ep_ids = macro_buffer.sample(args.batch_size)
 
-            # Truncate batch to only filled timesteps
-            max_ep_t = episode_sample.max_t_filled()
-            episode_sample = episode_sample[:, :max_ep_t]
+                # Truncate batch to only filled timesteps
+                max_ep_t = episode_sample.max_t_filled()
+                episode_sample = episode_sample[:, :max_ep_t]
 
-            if episode_sample.device != args.device:
-                episode_sample.to(args.device)
-            learner.value_train(episode_sample, runner.t_env, episode)
-            learner.macro_train(episode_sample, runner.t_env, episode)
+                if episode_sample.device != args.device:
+                    episode_sample.to(args.device)
+                learner.value_train(episode_sample, runner.t_env, episode)
+                learner.macro_train(episode_sample, runner.t_env, episode)
 
         if buffer.can_sample(args.batch_size):
             episode_sample, _ = buffer.sample(args.batch_size, ep_ids)
@@ -235,14 +243,17 @@ def run_sequential(args, logger):
             if episode_sample.device != args.device:
                 episode_sample.to(args.device)
 
-            macro_episode_sample, _ = macro_buffer.sample(args.batch_size, ep_ids)
+            if macro_buffer is not None:
+                macro_episode_sample, _ = macro_buffer.sample(args.batch_size, ep_ids)
 
-            # Truncate batch to only filled timesteps
-            max_ep_t = macro_episode_sample.max_t_filled()
-            macro_episode_sample = macro_episode_sample[:, :max_ep_t]
+                # Truncate batch to only filled timesteps
+                max_ep_t = macro_episode_sample.max_t_filled()
+                macro_episode_sample = macro_episode_sample[:, :max_ep_t]
 
-            if macro_episode_sample.device != args.device:
-                macro_episode_sample.to(args.device)
+                if macro_episode_sample.device != args.device:
+                    macro_episode_sample.to(args.device)
+            else:
+                macro_episode_sample = None
 
             learner.train(episode_sample, macro_episode_sample, runner.t_env, episode)
 
