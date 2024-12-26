@@ -1,8 +1,10 @@
+from typing import Any
 from modules.agents import REGISTRY as agent_REGISTRY
-from components.action_selectors import REGISTRY as action_REGISTRY, EpsilonGreedyActionSelector
+from components.action_selectors import REGISTRY as action_REGISTRY
 import torch as th
 import math
 from .controller import Controller
+from components.episode_buffer import EpisodeBatch
 
 
 # This multi-agent controller shares parameters between agents
@@ -17,15 +19,16 @@ class BasicMAC(Controller):
         print(args.action_selector)
         self.action_selector = action_REGISTRY[args.action_selector["type"]](args.action_selector)
         self.hidden_states = None
+        self.is_recurrent = self.agent.is_recurrent
 
-    def select_actions(self, ep_batch, t_ep, t_env, bs=slice(None), test_mode=False):
+    def select_actions(self, ep_batch: EpisodeBatch, t_ep, t_env, bs=slice(None), test_mode=False):
         # Only select actions for the selected batch elements in bs
         avail_actions = ep_batch["avail_actions"][:, t_ep]
         agent_outputs = self.forward(ep_batch, t_ep, test_mode=test_mode)
         chosen_actions = self.action_selector.select_action(agent_outputs[bs], avail_actions[bs], t_env, test_mode=test_mode)
         return chosen_actions
 
-    def forward(self, ep_batch, t, test_mode=False):
+    def forward(self, ep_batch: EpisodeBatch, t, test_mode=False):
         agent_inputs = self._build_inputs(ep_batch, t)
         avail_actions = ep_batch["avail_actions"][:, t]
         agent_outs, self.hidden_states = self.agent(agent_inputs, self.hidden_states)
@@ -75,11 +78,13 @@ class BasicMAC(Controller):
     def _build_agents(self, input_shape):
         self.agent = agent_REGISTRY[self.args.agent](input_shape, self.args)
 
-    def _build_inputs(self, batch, t):
+    def _build_inputs(self, batch: EpisodeBatch, t):
         bs = batch.batch_size
         extras = []
         if "subgoals_onehot" in batch.scheme:
             extras.append(batch["subgoals_onehot"][:, t])
+        if "laser_shaping" in batch.scheme:
+            extras.append(batch["laser_shaping"][:, t])
 
         if self.args.obs_last_action:
             if t == 0:
@@ -101,11 +106,13 @@ class BasicMAC(Controller):
             case _:
                 raise NotImplementedError()
 
-    def _get_input_shape(self, scheme):
+    def _get_input_shape(self, scheme: dict[str, Any]):
         if "subgoals_onehot" in scheme:
             extras_shape = math.prod(scheme["subgoals_onehot"]["vshape"])
         else:
             extras_shape = 0
+        if "laser_shaping" in scheme:
+            extras_shape += scheme["laser_shaping"]["vshape"][0]
         if self.args.obs_last_action:
             extras_shape += scheme["actions_onehot"]["vshape"][0]
         if self.args.obs_agent_id:

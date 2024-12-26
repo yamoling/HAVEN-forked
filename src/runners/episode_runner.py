@@ -2,19 +2,27 @@ from envs import REGISTRY as env_REGISTRY
 from functools import partial
 from components.episode_buffer import EpisodeBatch
 import numpy as np
+import torch
 import warnings
+from marlenv.adapters import PymarlAdapter
+from envs import LLEPotentialShaping
+from controllers import BasicMAC
 
 warnings.filterwarnings("ignore")
+from envs import MultiAgentEnv
 
 
 class EpisodeRunner:
+    env: MultiAgentEnv
+    mac: BasicMAC
+
     def __init__(self, args, logger):
         self.args = args
         self.logger = logger
         self.batch_size = self.args.batch_size_run
         assert self.batch_size == 1
 
-        self.env = env_REGISTRY[self.args.env](**self.args.env_args)
+        self.env = env_REGISTRY[self.args.env](**self.args.env_args, gamma=args.gamma)
         self.episode_limit = self.env.episode_limit
         self.t = 0
 
@@ -83,6 +91,11 @@ class EpisodeRunner:
                 "avail_actions": [self.env.get_avail_actions()],
                 "obs": [self.env.get_obs()],
             }
+            if "laser_shaping" in self.batch.scheme:
+                assert isinstance(self.env, PymarlAdapter)
+                shaping = self.env.env.wrapped
+                assert isinstance(shaping, LLEPotentialShaping)
+                pre_transition_data["laser_shaping"] = [shaping.get_laser_shaping()]
             self.batch.update(pre_transition_data, ts=self.t)
 
             if self.macro_batch is not None and self.t % self.args.k == 0:
@@ -109,7 +122,8 @@ class EpisodeRunner:
             else:
                 pre_transition_data = {}
             self.batch.update(pre_transition_data, ts=self.t)
-            actions = self.mac.select_actions(self.batch, t_ep=self.t, t_env=self.t_env, test_mode=test_mode)
+            with torch.no_grad():
+                actions = self.mac.select_actions(self.batch, t_ep=self.t, t_env=self.t_env, test_mode=test_mode)
 
             reward, terminated, env_info = self.env.step(actions[0])
             episode_return += reward

@@ -1,10 +1,13 @@
 from modules.agents import REGISTRY as agent_REGISTRY
 import torch as th
 from .controller import Controller
+from components.episode_buffer import EpisodeBatch
 
 
 # This multi-agent controller shares parameters between agents
 class ValueMAC(Controller):
+    is_recurrent: bool
+
     def __init__(self, scheme, groups, args):
         self.n_agents = args.n_agents
         self.args = args
@@ -12,13 +15,14 @@ class ValueMAC(Controller):
         self._build_agents(input_shape)
         super().__init__(self.agent)
         self.hidden_states = None
+        self.is_recurrent = self.agent.is_recurrent
 
-    def forward(self, ep_batch, t, test_mode=False):
+    def forward(self, ep_batch, t: int, test_mode=False):
         agent_inputs = self._build_inputs(ep_batch, t)
         agent_outs, self.hidden_states = self.agent(agent_inputs, self.hidden_states)
 
         # Softmax the agent outputs if they're policy logits
-        return agent_outs.view(ep_batch.batch_size, self.n_agents, -1)
+        return agent_outs  # .view(ep_batch.batch_size, self.n_agents, -1)
 
     def init_hidden(self, batch_size):
         self.hidden_states = self.agent.init_hidden()
@@ -40,7 +44,7 @@ class ValueMAC(Controller):
     def _build_agents(self, input_shape):
         self.agent = agent_REGISTRY[self.args.macro_value_network](input_shape, self.args)
 
-    def _build_inputs(self, batch, t):
+    def _build_inputs(self, batch: EpisodeBatch, t: int):
         # Assumes homogenous agents with flat observations.
         # Other MACs might want to e.g. delegate building inputs to each agent
         bs = batch.batch_size
@@ -50,17 +54,19 @@ class ValueMAC(Controller):
                 extras.append(th.zeros_like(batch["macro_actions_onehot"][:, t]))
             else:
                 extras.append(batch["macro_actions_onehot"][:, t - 1])
+        if "laser_shaping" in batch.scheme:
+            extras.append(batch["laser_shaping"][:, t])
         if self.args.obs_agent_id:
             extras.append(th.eye(self.n_agents, device=batch.device).unsqueeze(0).expand(bs, -1, -1))
+        obs = batch["obs"][:, t]
         match batch.scheme["obs"]["vshape"]:
             case int():
-                inputs = [batch["obs"][:, t], *extras]
+                inputs = [obs, *extras]
                 inputs = th.cat([x.reshape(bs * self.n_agents, -1) for x in inputs], dim=1)
                 return inputs
             case tuple():
-                inputs = th.tensor(batch["obs"][:, t])
                 extras = th.cat(extras, dim=-1)
-                return inputs, extras
+                return obs, extras
             case _:
                 raise NotImplementedError()
 
@@ -68,6 +74,8 @@ class ValueMAC(Controller):
         extras_shape = 0
         if self.args.obs_last_action:
             extras_shape += scheme["macro_actions_onehot"]["vshape"][0]
+        if "laser_shaping" in scheme:
+            extras_shape += scheme["laser_shaping"]["vshape"][0]
         if self.args.obs_agent_id:
             extras_shape += self.n_agents
 

@@ -10,6 +10,7 @@ class RNNAgent(nn.Module):
         self.fc1 = nn.Linear(input_shape, args.rnn_hidden_dim)
         self.rnn = nn.GRUCell(args.rnn_hidden_dim, args.rnn_hidden_dim)
         self.fc2 = nn.Linear(args.rnn_hidden_dim, args.n_actions)
+        self.is_recurrent = True
 
     def init_hidden(self):
         # make hidden states on same device as model

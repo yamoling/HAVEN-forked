@@ -17,6 +17,7 @@ class MacroMAC(Controller):
         self.action_selector = action_REGISTRY[args.macro_action_selector["type"]](args.macro_action_selector)
 
         self.hidden_states = None
+        self.is_recurrent = self.agent.is_recurrent
 
     def select_actions(self, ep_batch, t_ep, t_env, bs=slice(None), test_mode=False):
         # Only select actions for the selected batch elements in bs

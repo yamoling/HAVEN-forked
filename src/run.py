@@ -16,6 +16,8 @@ from controllers import REGISTRY as mac_REGISTRY
 from components.episode_buffer import ReplayBuffer
 from components.transforms import OneHot
 import pickle
+from envs import LLEPotentialShaping
+from marlenv.adapters import PymarlAdapter
 
 
 def run(_run, _config, _log):
@@ -107,6 +109,12 @@ def run_sequential(args, logger):
         "terminated": {"vshape": (1,), "dtype": th.uint8},
         "subgoals": {"vshape": (1,), "group": "agents", "dtype": th.long},
     }
+
+    match runner.env:
+        case PymarlAdapter() as env:
+            wrapped = env.env.wrapped
+            if isinstance(wrapped, LLEPotentialShaping):
+                scheme["laser_shaping"] = {"vshape": (wrapped.agents_pos_reached.shape[1],), "group": "agents", "dtype": th.float32}
 
     macro_scheme = {
         "state": {"vshape": env_info["state_shape"]},
@@ -214,10 +222,16 @@ def run_sequential(args, logger):
 
     logger.console_logger.info("Beginning training for {} timesteps".format(args.t_max))
     ep_ids = None
+    from collections import deque
+
+    durations = deque(maxlen=100)
+    i = 0
     while runner.t_env <= args.t_max:
+        i += 1
         # Run for a whole episode at a time
         episode_batch, macro_episode_batch = runner.run(test_mode=False)
         buffer.insert_episode_batch(episode_batch)
+        training_start = time.time()
         if macro_buffer is not None:
             macro_buffer.insert_episode_batch(macro_episode_batch)
 
@@ -256,7 +270,10 @@ def run_sequential(args, logger):
                 macro_episode_sample = None
 
             learner.train(episode_sample, macro_episode_sample, runner.t_env, episode)
-
+        training_stop = time.time()
+        durations.append(training_stop - training_start)
+        total = sum(durations)
+        print(f"[{i:10d}]Running last 100 trainings {total}s, avg duration:{total/len(durations)}")
         # Execute test runs once in a while
         n_test_runs = max(1, args.test_nepisode // runner.batch_size)
         if (runner.t_env - last_test_T) / args.test_interval >= 1.0:

@@ -5,7 +5,7 @@ from types import SimpleNamespace as SN
 
 
 class EpisodeBatch:
-    def __init__(self, scheme, groups, batch_size, max_seq_length, data=None, preprocess=None, device="cpu"):
+    def __init__(self, scheme: dict[str, Any], groups, batch_size, max_seq_length, data=None, preprocess=None, device="cpu"):
         self.scheme = scheme.copy()
         self.groups = groups
         self.batch_size = batch_size
@@ -68,7 +68,7 @@ class EpisodeBatch:
                 self.data.transition_data[field_key] = th.zeros((batch_size, max_seq_length, *shape), dtype=dtype, device=self.device)
 
     def extend(self, scheme, groups=None):
-        self._setup_data(scheme, self.groups if groups is None else groups, self.batch_size, self.max_seq_length)
+        self._setup_data(scheme, self.groups if groups is None else groups, self.batch_size, self.max_seq_length, self.preprocess)
 
     def to(self, device):
         for k, v in self.data.transition_data.items():
@@ -77,7 +77,7 @@ class EpisodeBatch:
             self.data.episode_data[k] = v.to(device)
         self.device = device
 
-    def update(self, data, bs: int | slice = slice(None), ts: int | slice = slice(None), mark_filled=True):
+    def update(self, data: dict[str, Any], bs: int | slice = slice(None), ts: int | slice = slice(None), mark_filled=True):
         slices = self._parse_slices((bs, ts))
         for k, v in data.items():
             if k in self.data.transition_data:
@@ -169,7 +169,7 @@ class EpisodeBatch:
         if (
             isinstance(items, slice)  # slice a:b
             or isinstance(items, int)  # int i
-            or (isinstance(items, (list, np.ndarray, th.LongTensor, th.cuda.LongTensor)))  # [a,b,c]
+            or (isinstance(items, (list, np.ndarray, th.LongTensor)))  # [a,b,c]
         ):
             items = (items, slice(None))
 
