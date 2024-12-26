@@ -19,7 +19,7 @@ class CNNAgent(nn.Module):
         self.linear = MLP(n_features, extras_size, (64, 64), n_outputs)
         self.output_shape = (n_outputs,)
         self.extras_shape = (extras_size,)
-        self.is_recurrent = True
+        self.is_recurrent = False
 
     def forward(self, obs_extras: tuple[torch.Tensor, torch.Tensor], hidden_states=None):
         # For transitions, the shape is (batch_size, n_agents, channels, height, width)

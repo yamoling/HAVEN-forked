@@ -101,9 +101,9 @@ if __name__ == "__main__":
         path = path + "_" + env_args["map_name"]
     elif "map" in env_args:
         path = path + "_" + str(env_args["map"])
+    ir_weight = config_dict["intrinsic_switch"]
     algo_name = config_dict["name"]
-    path = path + "_" + algo_name + "_gamma" + str(config_dict["gamma"])
+    path = f"{path}_{algo_name}_gamma{config_dict['gamma']}_ir{ir_weight}"
     file_obs_path = os.path.join(results_path, path)
     ex.observers.append(FileStorageObserver.create(file_obs_path))
-
     ex.run_commandline(params)

@@ -131,7 +131,7 @@ class HAVENLearner:
         avail_actions = batch["avail_actions"]
 
         # Calculate estimated Q-Values and next Q-values
-        if True:  # self.mac.is_recurrent:
+        if self.mac.is_recurrent:
             qvalues = []
             next_qvalues = []
             self.mac.init_hidden(batch.batch_size)
@@ -144,7 +144,7 @@ class HAVENLearner:
             qvalues = th.stack(qvalues, dim=1)  # Concat over time
             # We don't need the first timesteps Q-Value estimate for calculating targets
             next_qvalues = th.stack(next_qvalues[1:], dim=1)  # Concat across time
-        if True:
+        else:
             obs, extras, target_obs, target_extras = [], [], [], []
             for t in range(batch.max_seq_length):
                 o, e = self.mac._build_inputs(batch, t)
@@ -158,8 +158,7 @@ class HAVENLearner:
             qvalues, _ = self.mac.agent.forward((obs, extras))
             target_obs = th.stack(target_obs[1:], dim=1)
             target_extras = th.stack(target_extras[1:], dim=1)
-            next_qvalues1, _ = self.target_mac.agent.forward((target_obs, target_extras))
-        close = th.isclose(next_qvalues, next_qvalues1).all()
+            next_qvalues, _ = self.target_mac.agent.forward((target_obs, target_extras))
 
         # Mask out unavailable actions
         next_qvalues[avail_actions[:, 1:] == 0] = -9999999
@@ -371,68 +370,73 @@ class HAVENLearner:
         self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
 
     def calc_intrinsic_reward(self, batch: EpisodeBatch, macro_batch: EpisodeBatch):
-        origin_reward = batch["reward"][:, :-1]
-        if self.args.mean_weight:
-            origin_reward = th.ones_like(origin_reward)
-        terminated = batch["terminated"][:, :-1].float()
-        mask = batch["filled"][:, :-1].float()
-        mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
+        if self.args.intrinsic_switch != 0:
+            origin_reward = batch["reward"][:, :-1]
+            if self.args.mean_weight:
+                origin_reward = th.ones_like(origin_reward)
+            terminated = batch["terminated"][:, :-1].float()
+            mask = batch["filled"][:, :-1].float()
+            mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
 
-        if self.value_mac.is_recurrent:
-            assert self.macro_mac.is_recurrent
-            value_out = []
-            macro_mac_out = []
-            self.value_mac.init_hidden(macro_batch.batch_size)
-            self.macro_mac.init_hidden(macro_batch.batch_size)
-            for t in range(macro_batch.max_seq_length):
-                value_out.append(self.value_mac.forward(macro_batch, t=t))
-                macro_mac_out.append(self.macro_mac.forward(macro_batch, t=t))
-            value_out = th.stack(value_out, dim=1)
-            macro_mac_out = th.stack(macro_mac_out, dim=1)  # Concat over time
+            if self.value_mac.is_recurrent:
+                assert self.macro_mac.is_recurrent
+                value_out = []
+                macro_mac_out = []
+                self.value_mac.init_hidden(macro_batch.batch_size)
+                self.macro_mac.init_hidden(macro_batch.batch_size)
+                for t in range(macro_batch.max_seq_length):
+                    value_out.append(self.value_mac.forward(macro_batch, t=t))
+                    macro_mac_out.append(self.macro_mac.forward(macro_batch, t=t))
+                value_out = th.stack(value_out, dim=1)
+                macro_mac_out = th.stack(macro_mac_out, dim=1)  # Concat over time
+            else:
+                v_obs, v_extras, m_obs, m_extras = [], [], [], []
+                for t in range(macro_batch.max_seq_length):
+                    o, e = self.value_mac._build_inputs(macro_batch, t)
+                    v_obs.append(o)
+                    v_extras.append(e)
+                    o, e = self.macro_mac._build_inputs(macro_batch, t)
+                    m_obs.append(o)
+                    m_extras.append(e)
+                v_obs = th.stack(v_obs, dim=1)
+                v_extras = th.stack(v_extras, dim=1)
+                value_out, _ = self.value_mac.agent.forward((v_obs, v_extras))
+                m_obs = th.stack(m_obs, dim=1)
+                m_extras = th.stack(m_extras, dim=1)
+                macro_mac_out, _ = self.macro_mac.agent.forward((m_obs, m_extras))
+
+            values = self.value_mixer(value_out, macro_batch["state"])
+            macro_mac_out = th.gather(macro_mac_out, dim=3, index=macro_batch["macro_actions"]).squeeze(3)
+            macro_mac_out = self.macro_mixer(macro_mac_out, macro_batch["state"])
+            # values = value_out.squeeze(-1)
+
+            # intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
+            macro_reward = macro_batch["macro_reward"][:, :-1]
+            intrinsic_reward = macro_reward + self.args.gamma * values[:, 1:] - values[:, :-1]
+            intrinsic_reward = intrinsic_reward.unsqueeze(-2)
+            gap = intrinsic_reward.size(1) * self.args.k - origin_reward.size(1)
+            if gap != 0:
+                origin_reward = th.cat(
+                    [
+                        origin_reward,
+                        th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).to(
+                            self.device
+                        ),
+                    ],
+                    dim=1,
+                )
+            origin_reward = origin_reward.view(origin_reward.size(0), -1, self.args.k, 1)
+            if not self.args.mean_weight:
+                origin_reward[origin_reward == 0] = -9999999
+                origin_reward = intrinsic_reward.sign() * origin_reward
+            if gap != 0:
+                origin_reward[:, :, -gap:] = -9999999
+            origin_reward_weight = th.softmax(origin_reward, dim=-2)
+            intrinsic_reward = intrinsic_reward * origin_reward_weight
+            intrinsic_reward = intrinsic_reward.view(intrinsic_reward.size(0), -1, 1 if self.args.mixer is not None else self.args.n_agents)
+            intrinsic_reward = (intrinsic_reward[:, : batch.max_seq_length - 1] * mask).detach()
         else:
-            v_obs, v_extras, m_obs, m_extras = [], [], [], []
-            for t in range(macro_batch.max_seq_length):
-                o, e = self.value_mac._build_inputs(macro_batch, t)
-                v_obs.append(o)
-                v_extras.append(e)
-                o, e = self.macro_mac._build_inputs(macro_batch, t)
-                m_obs.append(o)
-                m_extras.append(e)
-            v_obs = th.stack(v_obs, dim=1)
-            v_extras = th.stack(v_extras, dim=1)
-            value_out, _ = self.value_mac.agent.forward((v_obs, v_extras))
-            m_obs = th.stack(m_obs, dim=1)
-            m_extras = th.stack(m_extras, dim=1)
-            macro_mac_out, _ = self.macro_mac.agent.forward((m_obs, m_extras))
-
-        values = self.value_mixer(value_out, macro_batch["state"])
-        macro_mac_out = th.gather(macro_mac_out, dim=3, index=macro_batch["macro_actions"]).squeeze(3)
-        macro_mac_out = self.macro_mixer(macro_mac_out, macro_batch["state"])
-        # values = value_out.squeeze(-1)
-
-        # intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
-        macro_reward = macro_batch["macro_reward"][:, :-1]
-        intrinsic_reward = macro_reward + self.args.gamma * values[:, 1:] - values[:, :-1]
-        intrinsic_reward = intrinsic_reward.unsqueeze(-2)
-        gap = intrinsic_reward.size(1) * self.args.k - origin_reward.size(1)
-        if gap != 0:
-            origin_reward = th.cat(
-                [
-                    origin_reward,
-                    th.zeros([intrinsic_reward.size(0), intrinsic_reward.size(1) * self.args.k - origin_reward.size(1), 1]).to(self.device),
-                ],
-                dim=1,
-            )
-        origin_reward = origin_reward.view(origin_reward.size(0), -1, self.args.k, 1)
-        if not self.args.mean_weight:
-            origin_reward[origin_reward == 0] = -9999999
-            origin_reward = intrinsic_reward.sign() * origin_reward
-        if gap != 0:
-            origin_reward[:, :, -gap:] = -9999999
-        origin_reward_weight = th.softmax(origin_reward, dim=-2)
-        intrinsic_reward = intrinsic_reward * origin_reward_weight
-        intrinsic_reward = intrinsic_reward.view(intrinsic_reward.size(0), -1, 1 if self.args.mixer is not None else self.args.n_agents)
-        intrinsic_reward = (intrinsic_reward[:, : batch.max_seq_length - 1] * mask).detach()
+            intrinsic_reward = 0.0
         intrinsic_reward = (
             self.args.intrinsic_switch * intrinsic_reward + self.args.reward_switch * batch["reward"][:, : batch.max_seq_length - 1]
         )
