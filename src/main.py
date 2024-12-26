@@ -47,7 +47,7 @@ def _get_config(params, arg_name, subfolder):
             break
 
     if config_name is not None:
-        with open(os.path.join(os.path.dirname(__file__), "config", subfolder, "{}.yaml".format(config_name)), "r") as f:
+        with open(os.path.join(os.path.dirname(__file__), "config", subfolder, f"{config_name}.yaml"), "r") as f:
             try:
                 config_dict = yaml.load(f, yaml.FullLoader)
             except yaml.YAMLError as exc:
@@ -95,15 +95,15 @@ if __name__ == "__main__":
 
     # Save to disk by default for sacred
     logger.info("Saving to FileStorageObserver in results/sacred.")
-    env_name = config_dict["env"]
+    path = config_dict["env"]
     env_args = config_dict["env_args"]
     if "map_name" in env_args:
-        env_name = env_name + "_" + env_args["map_name"]
+        path = path + "_" + env_args["map_name"]
     elif "map" in env_args:
-        env_name = env_name + "_" + str(env_args["map"])
+        path = path + "_" + str(env_args["map"])
     algo_name = config_dict["name"]
-    env_name = env_name + "_" + algo_name
-    file_obs_path = os.path.join(results_path, env_name)
+    path = path + "_" + algo_name + "_gamma" + str(config_dict["gamma"])
+    file_obs_path = os.path.join(results_path, path)
     ex.observers.append(FileStorageObserver.create(file_obs_path))
 
     ex.run_commandline(params)
