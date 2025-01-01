@@ -1,6 +1,6 @@
 #!/bin/bash
-envs=("shaped-lle-lvl6")
-configs=("vdn-cnn" "vdn-cnn-no-ir" "haven-cnn-vdn" "haven-cnn-vdn-no-ir" "haven-cnn-qmix" "haven-cnn-qmix-no-ir" "qmix-cnn" "qmix-cnn-no-ir")
+envs=("shaped-lle-no-reward")
+configs=("haven-cnn-vdn" "haven-cnn-vdn-no-ir")
 n_seeds=8
 n_concurrent=16
 

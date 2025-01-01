@@ -34,10 +34,20 @@ def lle_fn(**kwargs):
     return marlenv.adapters.PymarlAdapter(env, time_limit)
 
 
+def str_to_bool(value: str) -> bool:
+    if value in {"true", "True", "1"}:
+        return True
+    if value in {"false", "False", "0"}:
+        return False
+    raise ValueError(f"Can not convert {value} to boolean")
+
+
 def shaped_lle(
     *,
     gamma: float,
     map: str | int,
+    enable_shaped_subgoals: bool | str,
+    reward_value: float = 0.1,
     obs_type: Literal["layered", "flattened", "partial3x3", "partial5x5", "partial7x7", "state", "image", "perspective"] = "layered",
     state_type: Literal["layered", "flattened", "partial3x3", "partial5x5", "partial7x7", "state", "image", "perspective"] = "flattened",
     seed: int | None = None,
@@ -50,6 +60,9 @@ def shaped_lle(
         case other:
             raise ValueError(f"Invalid map: {other}")
 
+    if isinstance(enable_shaped_subgoals, str):
+        enable_shaped_subgoals = str_to_bool(enable_shaped_subgoals)
+
     env = env.obs_type(obs_type).state_type(state_type).single_objective()
     if seed is not None:
         seed = int(seed)
@@ -57,7 +70,13 @@ def shaped_lle(
     time_limit = env.width * env.height // 2
     l1 = env.world.laser_sources[4, 0]
     l2 = env.world.laser_sources[6, 12]
-    env = LLEPotentialShaping(env, {l1: Direction.SOUTH, l2: Direction.SOUTH}, gamma)
+    env = LLEPotentialShaping(
+        env,
+        {l1: Direction.SOUTH, l2: Direction.SOUTH},
+        gamma,
+        reward_value=reward_value,
+        enable_extras=bool(enable_shaped_subgoals),
+    )
     return marlenv.adapters.PymarlAdapter(env, time_limit)
 
 

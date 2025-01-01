@@ -16,7 +16,6 @@ class BasicMAC(Controller):
         self._build_agents(input_shape)
         super().__init__(self.agent)
         self.agent_output_type = args.agent_output_type
-        print(args.action_selector)
         self.action_selector = action_REGISTRY[args.action_selector["type"]](args.action_selector)
         self.hidden_states = None
         self.is_recurrent = self.agent.is_recurrent

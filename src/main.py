@@ -103,7 +103,12 @@ if __name__ == "__main__":
         path = path + "_" + str(env_args["map"])
     ir_weight = config_dict["intrinsic_switch"]
     algo_name = config_dict["name"]
-    path = f"{path}_{algo_name}_gamma{config_dict['gamma']}_ir{ir_weight}"
+    path = f"{path}_{algo_name}"
+    if config_dict["env"] == "shaped_lle":
+        if env_args["reward_value"] == 0:
+            path = f"{path}-no-shaped-reward"
+        if not env_args["enable_shaped_subgoals"]:
+            path = f"{path}-no-shaped-subgoals"
     file_obs_path = os.path.join(results_path, path)
     ex.observers.append(FileStorageObserver.create(file_obs_path))
     ex.run_commandline(params)

@@ -14,7 +14,7 @@ from learners import REGISTRY as le_REGISTRY
 from runners import REGISTRY as r_REGISTRY
 from controllers import REGISTRY as mac_REGISTRY
 from components.episode_buffer import ReplayBuffer
-from components.transforms import OneHot
+from components.transforms import OneHot, NoTransform
 import pickle
 from envs import LLEPotentialShaping
 from marlenv.adapters import PymarlAdapter
@@ -33,6 +33,8 @@ def run(_run, _config, _log):
         args.device = th.device(f"cuda:{seed % n_devices}")
     else:
         args.device = th.device("cpu")
+
+    args.train_value = args.intrinsic_switch > 0
 
     # setup loggers
     logger = Logger(_log)
@@ -113,7 +115,7 @@ def run_sequential(args, logger):
     match runner.env:
         case PymarlAdapter() as env:
             wrapped = env.env.wrapped
-            if isinstance(wrapped, LLEPotentialShaping):
+            if isinstance(wrapped, LLEPotentialShaping) and wrapped.enable_extras:
                 scheme["laser_shaping"] = {"vshape": (wrapped.agents_pos_reached.shape[1],), "group": "agents", "dtype": th.float32}
 
     macro_scheme = {
@@ -124,13 +126,20 @@ def run_sequential(args, logger):
         "terminated": {"vshape": (1,), "dtype": th.uint8},
     }
     groups = {"agents": args.n_agents}
-    preprocess = {
+    preprocess: dict = {
         "actions": ("actions_onehot", [OneHot(out_dim=args.n_actions)]),
     }
     macro_preprocess = {}
     if hasattr(args, "n_subgoals"):
-        preprocess["subgoals"] = ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)])
-        macro_preprocess["macro_actions"] = ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])
+        if args.enable_haven_subgoals:
+            preprocess["subgoals"] = ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)])
+            macro_preprocess["macro_actions"] = ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])
+        else:
+            # Dans ce cas-ci, c'est qu'on va remplacer les subgoals de Haven par les subgoals de l'environnement
+            preprocess["subgoals"] = ("subgoals_onehot", [NoTransform()])
+            macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform()])
+            # TODO: s'assurer que le nombre de subgoals correspond à celui de l'environnement
+            raise NotImplementedError("Double check the implementation before running !")
 
     buffer = ReplayBuffer(
         scheme,
@@ -151,7 +160,10 @@ def run_sequential(args, logger):
             device="cpu" if args.buffer_cpu_only else args.device,
         )
         macro_mac = mac_REGISTRY[args.macro_mac](macro_buffer.scheme, groups, args)
-        value_mac = mac_REGISTRY["value_mac"](macro_buffer.scheme, groups, args)
+        if args.train_value:
+            value_mac = mac_REGISTRY["value_mac"](macro_buffer.scheme, groups, args)
+        else:
+            value_mac = None
     else:
         macro_buffer = None
         macro_mac = None
@@ -241,8 +253,10 @@ def run_sequential(args, logger):
 
                 if episode_sample.device != args.device:
                     episode_sample.to(args.device)
-                learner.value_train(episode_sample, runner.t_env, episode)
+
                 learner.macro_train(episode_sample, runner.t_env, episode)
+                if args.train_value:
+                    learner.value_train(episode_sample, runner.t_env, episode)
 
         if buffer.can_sample(args.batch_size):
             episode_sample, _ = buffer.sample(args.batch_size, ep_ids)

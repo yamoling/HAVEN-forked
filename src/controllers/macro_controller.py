@@ -64,9 +64,10 @@ class MacroMAC(Controller):
         extras = []
         if self.args.obs_last_action:
             if t == 0:
-                extras.append(th.zeros_like(batch["macro_actions_onehot"][:, t]))
+                last_action = th.zeros_like(batch["macro_actions_onehot"][:, t])
             else:
-                extras.append(batch["macro_actions_onehot"][:, t - 1])
+                last_action = batch["macro_actions_onehot"][:, t - 1]
+            extras.append(last_action)
         if self.args.obs_agent_id:
             extras.append(th.eye(self.n_agents, device=batch.device).unsqueeze(0).expand(bs, -1, -1))
 
@@ -84,7 +85,7 @@ class MacroMAC(Controller):
 
     def _get_input_shape(self, scheme):
         extras_shape = 0
-        if self.args.obs_last_action:
+        if self.args.obs_last_action and self.args.enable_haven_subgoals:
             extras_shape += scheme["macro_actions_onehot"]["vshape"][0]
         if self.args.obs_agent_id:
             extras_shape += self.n_agents

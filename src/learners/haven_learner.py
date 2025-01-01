@@ -8,17 +8,21 @@ from controllers import ValueMAC, MacroMAC, BasicMAC
 
 
 class HAVENLearner:
-    def __init__(self, mac: BasicMAC, macro_mac: MacroMAC, value_mac: ValueMAC, scheme, logger, args):
+    def __init__(self, mac: BasicMAC, macro_mac: MacroMAC, value_mac: ValueMAC | None, scheme, logger, args):
         self.args = args
         self.mac = mac
         self.macro_mac = macro_mac
         self.value_mac = value_mac
         self.logger = logger
         self.device = th.device("cpu")
+        if self.args.intrinsic_switch != 0:
+            assert value_mac is not None
 
         self.params = list(mac.parameters())
         self.macro_params = list(macro_mac.parameters())
-        self.value_params = list(value_mac.parameters())
+        self.value_params = list[th.nn.Parameter]()
+        if value_mac is not None:
+            self.value_params = list(value_mac.parameters())
 
         self.last_target_update_episode = 0
         self.last_target_macro_update_episode = 0
@@ -56,7 +60,10 @@ class HAVENLearner:
 
         self.optimiser = RMSprop(params=self.params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
         self.macro_optimiser = RMSprop(params=self.macro_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
-        self.value_optimiser = RMSprop(params=self.value_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
+        if self.value_mac is not None:
+            self.value_optimiser = RMSprop(params=self.value_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
+        else:
+            self.value_optimiser = None
         # a little wasteful to deepcopy (e.g. duplicates action selector), but should work for any MAC
         self.target_mac = copy.deepcopy(mac)
         self.target_value_mac = copy.deepcopy(value_mac)
@@ -65,6 +72,9 @@ class HAVENLearner:
         self.log_stats_t = -self.args.learner_log_interval - 1
 
     def value_train(self, batch: EpisodeBatch, t_env: int, episode_num: int):
+        if self.value_mac is None:
+            return
+        assert self.value_optimiser is not None
         rewards = batch["macro_reward"][:, :-1]
         terminated = batch["terminated"][:, :-1].float()
         mask = batch["filled"][:, :-1].float()
@@ -312,7 +322,8 @@ class HAVENLearner:
         self.logger.console_logger.info("Updated target macro network")
 
     def _update_value_targets(self):
-        self.target_value_mac.load_state(self.value_mac)
+        if self.value_mac is not None and self.target_value_mac is not None:
+            self.target_value_mac.load_state(self.value_mac)
         if self.value_mixer is not None:
             self.target_value_mixer.load_state_dict(self.value_mixer.state_dict())
         self.logger.console_logger.info("Updated target value network")
@@ -323,8 +334,10 @@ class HAVENLearner:
         self.target_mac.to(device)
         self.macro_mac.to(device)
         self.target_macro_mac.to(device)
-        self.value_mac.to(device)
-        self.target_value_mac.to(device)
+        if self.value_mac is not None:
+            self.value_mac.to(device)
+        if self.target_value_mac is not None:
+            self.target_value_mac.to(device)
         if self.mixer is not None:
             self.mixer.to(device)
             self.target_mixer.to(device)
@@ -340,10 +353,11 @@ class HAVENLearner:
         if self.mixer is not None:
             th.save(self.mixer.state_dict(), "{}/mixer.th".format(path))
         th.save(self.optimiser.state_dict(), "{}/opt.th".format(path))
-        self.value_mac.save_models(path)
-        if self.value_mixer is not None:
+        if self.value_mac is not None:
+            self.value_mac.save_models(path)
+        if self.value_mixer is not None and self.value_optimiser is not None:
             th.save(self.value_mixer.state_dict(), "{}/value_mixer.th".format(path))
-        th.save(self.value_optimiser.state_dict(), "{}/value_opt.th".format(path))
+            th.save(self.value_optimiser.state_dict(), "{}/value_opt.th".format(path))
         self.macro_mac.save_models(path)
         if self.macro_mixer is not None:
             th.save(self.macro_mixer.state_dict(), "{}/macro_mixer.th".format(path))
@@ -356,12 +370,14 @@ class HAVENLearner:
         if self.mixer is not None:
             self.mixer.load_state_dict(th.load("{}/mixer.th".format(path), map_location=lambda storage, loc: storage))
         self.optimiser.load_state_dict(th.load("{}/opt.th".format(path), map_location=lambda storage, loc: storage))
-        self.value_mac.load_models(path)
+        if self.value_mac is not None:
+            self.value_mac.load_models(path)
         # Not quite right but I don't want to save target networks
-        self.target_value_mac.load_models(path)
-        if self.value_mixer is not None:
+        if self.target_value_mac is not None:
+            self.target_value_mac.load_models(path)
+        if self.value_mixer is not None and self.value_optimiser is not None:
             self.value_mixer.load_state_dict(th.load("{}/value_mixer.th".format(path), map_location=lambda storage, loc: storage))
-        self.value_optimiser.load_state_dict(th.load("{}/value_opt.th".format(path), map_location=lambda storage, loc: storage))
+            self.value_optimiser.load_state_dict(th.load("{}/value_opt.th".format(path), map_location=lambda storage, loc: storage))
         self.macro_mac.load_models(path)
         # Not quite right but I don't want to save target networks
         self.target_macro_mac.load_models(path)
@@ -370,7 +386,7 @@ class HAVENLearner:
         self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
 
     def calc_intrinsic_reward(self, batch: EpisodeBatch, macro_batch: EpisodeBatch):
-        if self.args.intrinsic_switch != 0:
+        if self.args.intrinsic_switch != 0 and self.value_mac is not None:
             origin_reward = batch["reward"][:, :-1]
             if self.args.mean_weight:
                 origin_reward = th.ones_like(origin_reward)

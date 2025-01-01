@@ -20,3 +20,8 @@ class OneHot(Transform):
 
     def infer_output_info(self, vshape_in, dtype_in):
         return (self.out_dim,), th.float32
+
+
+class NoTransform(Transform):
+    def transform(self, tensor):
+        return tensor

@@ -1,15 +1,16 @@
-from envs import REGISTRY as env_REGISTRY
+import warnings
 from functools import partial
-from components.episode_buffer import EpisodeBatch
+
 import numpy as np
 import torch
-import warnings
 from marlenv.adapters import PymarlAdapter
-from envs import LLEPotentialShaping
+
+from components.episode_buffer import EpisodeBatch
 from controllers import BasicMAC
+from envs import REGISTRY as env_REGISTRY
+from envs import LLEPotentialShaping, MultiAgentEnv
 
 warnings.filterwarnings("ignore")
-from envs import MultiAgentEnv
 
 
 class EpisodeRunner:
@@ -112,9 +113,12 @@ class EpisodeRunner:
                 macro_reward = 0
                 self.macro_batch.update(post_macro_transition_data, ts=self.t // self.args.k - 1)
             if self.macro_batch is not None and self.t % self.args.k == 0:
-                macro_actions = self.macro_mac.select_actions(
-                    self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
-                )
+                if self.args.enable_haven_subgoals:
+                    macro_actions = self.macro_mac.select_actions(
+                        self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
+                    )
+                else:
+                    macro_actions = pre_transition_data["laser_shaping"]
             if self.macro_batch is not None:
                 pre_transition_data = {
                     "subgoals": macro_actions,

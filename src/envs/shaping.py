@@ -20,9 +20,15 @@ class PotentialShaping(RLEnvWrapper):
 
     gamma: float
 
-    def __init__(self, env: MARLEnv, gamma: float, extra_shape: Optional[tuple[int]] = None):
+    def __init__(
+        self,
+        env: MARLEnv,
+        gamma: float,
+        extra_shape: Optional[tuple[int]] = None,
+    ):
         super().__init__(env, extra_shape=extra_shape)
         self.gamma = gamma
+        self.current_potential = self.compute_potential()
 
     def add_extras(self, obs: Observation) -> Observation:
         """Add the extras related to potential shaping. Does nothing by default."""
@@ -54,6 +60,7 @@ class LLEPotentialShaping(PotentialShaping):
         lasers_to_reward: dict[LaserSource, Direction],
         gamma: float,
         reward_value: float = 1.0,
+        enable_extras: bool = True,
     ):
         """
         Parameters:
@@ -62,17 +69,18 @@ class LLEPotentialShaping(PotentialShaping):
          - lasers_to_reward: A dictionary mapping each laser source that has to be rewarded to the direction in which the agents have to move.
          - discount_factor: The discount factor `gamma`
         """
-        # *2 because we reward in the laser and after the laser
-        n_extras = len(lasers_to_reward) * 2
-        assert len(env.extra_shape) == 1
-        super().__init__(env, gamma)
         self.gamma = gamma
         self.reward_value = reward_value
-        self.pos_to_reward = LLEPotentialShaping._compute_positions_to_reward(lasers_to_reward, env.world)
-        self.agents_pos_reached = np.full((env.n_agents, len(self.pos_to_reward)), False, dtype=np.bool)
-        assert self.agents_pos_reached.shape[1] == n_extras
         self.world = env.world
-        self.current_potential = self.compute_potential()
+        self.enable_extras = enable_extras
+        self.pos_to_reward = self._compute_positions_to_reward(lasers_to_reward, env.world)
+        self.agents_pos_reached = np.full((env.n_agents, len(self.pos_to_reward)), False, dtype=np.bool)
+        if enable_extras:
+            assert len(env.extra_shape) == 1
+            # *2 because we reward in the laser and after the laser
+            n_extras = len(lasers_to_reward) * 2
+            assert self.agents_pos_reached.shape[1] == n_extras
+        super().__init__(env, gamma)  # type: ignore
 
     @staticmethod
     def _compute_positions_to_reward(lasers_to_reward: dict[LaserSource, Direction], world: World):
@@ -103,12 +111,6 @@ class LLEPotentialShaping(PotentialShaping):
                 if agent_pos in rewarded_positions:
                     self.agents_pos_reached[agent_num, j] = True
         return float(self.agents_pos_reached.size - self.agents_pos_reached.sum()) * self.reward_value
-
-    # def add_extras(self, obs: Observation) -> Observation:
-    #     # Each agent is given its own set of reached positions
-    #     extras = self.agents_pos_reached.astype(np.float32)
-    #     obs.extras = np.concatenate([obs.extras, extras], axis=1)
-    #     return super().add_extras(obs)
 
     def get_laser_shaping(self):
         return self.agents_pos_reached.astype(np.float32)
