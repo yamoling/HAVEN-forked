@@ -1,0 +1,1078 @@
+[INFO 04:18:30] pymarl Running command 'my_main'
+[INFO 04:18:30] pymarl Started run with ID "12"
+[DEBUG 04:18:30] pymarl Starting Heartbeat
+[DEBUG 04:18:30] my_main Started
+[INFO 04:18:30] my_main Experiment Parameters:
+[INFO 04:18:30] my_main 
+
+{   'action_selector': {   'epsilon_anneal_time': 50000,
+                           'epsilon_finish': 0.05,
+                           'epsilon_start': 1.0,
+                           'type': 'epsilon_greedy'},
+    'agent': 'cnn',
+    'agent_output_type': 'q',
+    'batch_size': 32,
+    'batch_size_run': 1,
+    'buffer_cpu_only': True,
+    'buffer_size': 5000,
+    'checkpoint_path': '',
+    'critic_lr': 0.0005,
+    'double_q': True,
+    'env': 'lle',
+    'env_args': {   'map': 6,
+                    'obs_type': 'layered',
+                    'seed': 14},
+    'evaluate': False,
+    'gamma': 0.99,
+    'grad_norm_clip': 10,
+    'hypernet_embed': 64,
+    'hypernet_layers': 2,
+    'intrinsic_switch': 1,
+    'k': 3,
+    'label': 'default_label',
+    'learner': 'haven_learner',
+    'learner_log_interval': 10000,
+    'load_step': 0,
+    'local_results_path': 'results',
+    'log_interval': 10000,
+    'lr': 0.0005,
+    'mac': 'basic_mac',
+    'macro_action_selector': {   'epsilon_anneal_time': 50000,
+                                 'epsilon_finish': 0.05,
+                                 'epsilon_start': 1.0,
+                                 'type': 'epsilon_greedy'},
+    'macro_agent': 'macro',
+    'macro_mac': 'macro_mac',
+    'macro_mixer': 'qmix',
+    'macro_network': 'macro-cnn',
+    'macro_value_network': 'value-cnn',
+    'mean_weight': True,
+    'mixer': 'qmix',
+    'mixing_embed_dim': 32,
+    'n_subgoals': 8,
+    'name': 'haven-cnn-qmix',
+    'obs_agent_id': True,
+    'obs_last_action': True,
+    'optim_alpha': 0.99,
+    'optim_eps': 1e-05,
+    'repeat_id': 1,
+    'reward_switch': 1,
+    'rnn_hidden_dim': 64,
+    'runner': 'episode',
+    'runner_log_interval': 10000,
+    'save_model': True,
+    'save_model_interval': 1000000,
+    'save_replay': False,
+    'seed': 14,
+    't_max': 1000000,
+    'target_update_interval': 200,
+    'test_greedy': True,
+    'test_interval': 10000,
+    'test_nepisode': 32,
+    'use_cuda': True,
+    'use_tensorboard': False,
+    'value_mixer': 'qmix'}
+
+[INFO 04:18:46] my_main Beginning training for 1000000 timesteps
+[INFO 04:18:48] my_main t_env: 18 / 1000000
+[INFO 04:18:48] my_main Estimated time left: 3 minutes, 13 seconds. Time passed: 1 seconds
+[INFO 04:19:12] my_main Saving models to results/models/haven-cnn-qmix__2024-12-18_04-18-30/18
+[INFO 04:22:40] my_main Updated target value network
+[INFO 04:22:40] my_main Updated target macro network
+[INFO 04:22:40] my_main Updated target network
+[INFO 04:25:58] my_main t_env: 10041 / 1000000
+[INFO 04:25:58] my_main Estimated time left: 11 hours, 49 minutes, 14 seconds. Time passed: 7 minutes, 12 seconds
+[INFO 04:26:27] my_main Recent Stats | t_env:      10041 | Episode:      355
+ep_length_mean:           23.1568	epsilon:                   0.8107	exit_rate_mean:            0.0000	gems_collected_mean:       0.0071
+grad_norm:                 0.6496	loss:                      0.2018	macro_loss:                0.1909	q_taken_mean:             -0.0143
+return_mean:              -0.9407	return_std:                0.1783	target_mean:              -0.0318	td_error_abs:              0.1785
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.2661	
+[INFO 04:27:30] my_main Updated target value network
+[INFO 04:27:30] my_main Updated target macro network
+[INFO 04:27:30] my_main Updated target network
+[INFO 04:30:49] my_main t_env: 20056 / 1000000
+[INFO 04:30:49] my_main Estimated time left: 7 hours, 54 minutes, 29 seconds. Time passed: 12 minutes, 3 seconds
+[INFO 04:31:19] my_main Recent Stats | t_env:      20056 | Episode:      535
+ep_length_mean:           33.9841	epsilon:                   0.6204	exit_rate_mean:            0.0000	gems_collected_mean:       0.0084
+grad_norm:                 0.4453	loss:                      0.1127	macro_loss:                0.1195	q_taken_mean:             -0.0071
+return_mean:              -0.7567	return_std:                0.2888	target_mean:              -0.0179	td_error_abs:              0.1344
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1878	
+[INFO 04:33:04] my_main Updated target value network
+[INFO 04:33:05] my_main Updated target macro network
+[INFO 04:33:05] my_main Updated target network
+[INFO 04:35:00] my_main t_env: 30073 / 1000000
+[INFO 04:35:00] my_main Estimated time left: 6 hours, 44 minutes, 58 seconds. Time passed: 16 minutes, 14 seconds
+[INFO 04:35:29] my_main Recent Stats | t_env:      30073 | Episode:      668
+ep_length_mean:           44.3171	epsilon:                   0.4301	exit_rate_mean:            0.0000	gems_collected_mean:       0.0063
+grad_norm:                 0.4217	loss:                      0.0792	macro_loss:                0.0867	q_taken_mean:              0.0011
+return_mean:              -0.5826	return_std:                0.2835	target_mean:              -0.0088	td_error_abs:              0.1132
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1576	
+[INFO 04:39:07] my_main t_env: 40135 / 1000000
+[INFO 04:39:07] my_main Estimated time left: 6 hours, 32 minutes, 12 seconds. Time passed: 20 minutes, 21 seconds
+[INFO 04:39:35] my_main Recent Stats | t_env:      40135 | Episode:      797
+ep_length_mean:           51.0536	epsilon:                   0.2389	exit_rate_mean:            0.0000	gems_collected_mean:       0.0050
+grad_norm:                 0.3595	loss:                      0.0612	macro_loss:                0.0711	q_taken_mean:              0.0063
+return_mean:              -0.4661	return_std:                0.2268	target_mean:              -0.0024	td_error_abs:              0.0966
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1529	
+[INFO 04:39:41] my_main Updated target value network
+[INFO 04:39:41] my_main Updated target macro network
+[INFO 04:39:42] my_main Updated target network
+[INFO 04:43:16] my_main t_env: 50143 / 1000000
+[INFO 04:43:16] my_main Estimated time left: 6 hours, 34 minutes, 19 seconds. Time passed: 24 minutes, 30 seconds
+[INFO 04:43:42] my_main Recent Stats | t_env:      50143 | Episode:      928
+ep_length_mean:           62.7330	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0050
+grad_norm:                 0.3024	loss:                      0.0505	macro_loss:                0.0757	q_taken_mean:              0.0105
+return_mean:              -0.2798	return_std:                0.2774	target_mean:               0.0040	td_error_abs:              0.0866
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1788	
+[INFO 04:45:44] my_main Updated target value network
+[INFO 04:45:44] my_main Updated target macro network
+[INFO 04:45:45] my_main Updated target network
+[INFO 04:47:20] my_main t_env: 60178 / 1000000
+[INFO 04:47:20] my_main Estimated time left: 6 hours, 20 minutes, 30 seconds. Time passed: 28 minutes, 34 seconds
+[INFO 04:47:45] my_main Recent Stats | t_env:      60178 | Episode:     1059
+ep_length_mean:           72.3909	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0022
+grad_norm:                 0.1862	loss:                      0.0107	macro_loss:                0.0421	q_taken_mean:              0.0186
+return_mean:              -0.1142	return_std:                0.2574	target_mean:               0.0156	td_error_abs:              0.0563
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1363	
+[INFO 04:51:27] my_main t_env: 70221 / 1000000
+[INFO 04:51:27] my_main Estimated time left: 6 hours, 21 minutes, 6 seconds. Time passed: 32 minutes, 41 seconds
+[INFO 04:51:54] my_main Recent Stats | t_env:      70221 | Episode:     1199
+ep_length_mean:           75.6103	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0014
+grad_norm:                 0.1619	loss:                      0.0068	macro_loss:                0.0426	q_taken_mean:              0.0255
+return_mean:              -0.0707	return_std:                0.2308	target_mean:               0.0237	td_error_abs:              0.0448
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1285	
+[INFO 04:51:56] my_main Updated target value network
+[INFO 04:51:56] my_main Updated target macro network
+[INFO 04:51:56] my_main Updated target network
+[INFO 04:55:49] my_main t_env: 80270 / 1000000
+[INFO 04:55:49] my_main Estimated time left: 6 hours, 40 minutes, 6 seconds. Time passed: 37 minutes, 3 seconds
+[INFO 04:56:17] my_main Recent Stats | t_env:      80270 | Episode:     1354
+ep_length_mean:           73.5136	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0027
+grad_norm:                 0.0954	loss:                      0.0051	macro_loss:                0.0478	q_taken_mean:              0.0290
+return_mean:              -0.1361	return_std:                0.2773	target_mean:               0.0289	td_error_abs:              0.0370
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1217	
+[INFO 04:57:27] my_main Updated target value network
+[INFO 04:57:27] my_main Updated target macro network
+[INFO 04:57:28] my_main Updated target network
+[INFO 05:00:44] my_main t_env: 90281 / 1000000
+[INFO 05:00:44] my_main Estimated time left: 7 hours, 26 minutes, 36 seconds. Time passed: 41 minutes, 58 seconds
+[INFO 05:01:12] my_main Recent Stats | t_env:      90281 | Episode:     1549
+ep_length_mean:           68.1813	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0037
+grad_norm:                 0.0811	loss:                      0.0046	macro_loss:                0.0580	q_taken_mean:              0.0325
+return_mean:              -0.2490	return_std:                0.3765	target_mean:               0.0328	td_error_abs:              0.0350
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1075	
+[INFO 05:02:17] my_main Updated target value network
+[INFO 05:02:17] my_main Updated target macro network
+[INFO 05:02:18] my_main Updated target network
+[INFO 05:06:17] my_main t_env: 100291 / 1000000
+[INFO 05:06:17] my_main Estimated time left: 8 hours, 19 minutes, 16 seconds. Time passed: 47 minutes, 31 seconds
+[INFO 05:06:45] my_main Recent Stats | t_env:     100291 | Episode:     1790
+ep_length_mean:           61.2090	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0037
+grad_norm:                 0.0824	loss:                      0.0039	macro_loss:                0.0548	q_taken_mean:              0.0334
+return_mean:              -0.3904	return_std:                0.4113	target_mean:               0.0340	td_error_abs:              0.0333
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0768	
+[INFO 05:06:59] my_main Updated target value network
+[INFO 05:06:59] my_main Updated target macro network
+[INFO 05:06:59] my_main Updated target network
+[INFO 05:11:15] my_main Updated target value network
+[INFO 05:11:15] my_main Updated target macro network
+[INFO 05:11:16] my_main Updated target network
+[INFO 05:11:47] my_main t_env: 110301 / 1000000
+[INFO 05:11:47] my_main Estimated time left: 8 hours, 8 minutes, 51 seconds. Time passed: 53 minutes, 1 seconds
+[INFO 05:12:17] my_main Recent Stats | t_env:     110301 | Episode:     2025
+ep_length_mean:           54.4075	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0037
+grad_norm:                 0.0792	loss:                      0.0044	macro_loss:                0.0664	q_taken_mean:              0.0402
+return_mean:              -0.5218	return_std:                0.4506	target_mean:               0.0406	td_error_abs:              0.0359
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0923	
+[INFO 05:16:08] my_main t_env: 120334 / 1000000
+[INFO 05:16:08] my_main Estimated time left: 6 hours, 20 minutes, 58 seconds. Time passed: 57 minutes, 22 seconds
+[INFO 05:16:37] my_main Recent Stats | t_env:     120334 | Episode:     2175
+ep_length_mean:           53.4377	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0090
+grad_norm:                 0.1181	loss:                      0.0050	macro_loss:                0.0655	q_taken_mean:              0.0434
+return_mean:              -0.5529	return_std:                0.4823	target_mean:               0.0414	td_error_abs:              0.0401
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0920	
+[INFO 05:17:19] my_main Updated target value network
+[INFO 05:17:19] my_main Updated target macro network
+[INFO 05:17:19] my_main Updated target network
+[INFO 05:20:20] my_main t_env: 130386 / 1000000
+[INFO 05:20:20] my_main Estimated time left: 6 hours, 2 minutes, 37 seconds. Time passed: 1 hours, 1 minutes, 34 seconds
+[INFO 05:20:47] my_main Recent Stats | t_env:     130386 | Episode:     2312
+ep_length_mean:           55.1457	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0223
+grad_norm:                 0.1864	loss:                      0.0063	macro_loss:                0.0706	q_taken_mean:              0.0472
+return_mean:              -0.4944	return_std:                0.4755	target_mean:               0.0432	td_error_abs:              0.0459
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1072	
+[INFO 05:23:13] my_main Updated target value network
+[INFO 05:23:13] my_main Updated target macro network
+[INFO 05:23:13] my_main Updated target network
+[INFO 05:24:30] my_main t_env: 140449 / 1000000
+[INFO 05:24:30] my_main Estimated time left: 5 hours, 56 minutes, 47 seconds. Time passed: 1 hours, 5 minutes, 44 seconds
+[INFO 05:25:00] my_main Recent Stats | t_env:     140449 | Episode:     2446
+ep_length_mean:           59.8974	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0362
+grad_norm:                 0.1759	loss:                      0.0063	macro_loss:                0.0686	q_taken_mean:              0.0464
+return_mean:              -0.3831	return_std:                0.4516	target_mean:               0.0432	td_error_abs:              0.0463
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1169	
+[INFO 05:28:38] my_main t_env: 150506 / 1000000
+[INFO 05:28:38] my_main Estimated time left: 5 hours, 48 minutes, 20 seconds. Time passed: 1 hours, 9 minutes, 52 seconds
+[INFO 05:29:07] my_main Recent Stats | t_env:     150506 | Episode:     2579
+ep_length_mean:           66.7136	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0437
+grad_norm:                 0.1678	loss:                      0.0067	macro_loss:                0.0664	q_taken_mean:              0.0496
+return_mean:              -0.2400	return_std:                0.4346	target_mean:               0.0458	td_error_abs:              0.0468
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1214	
+[INFO 05:29:41] my_main Updated target value network
+[INFO 05:29:41] my_main Updated target macro network
+[INFO 05:29:41] my_main Updated target network
+[INFO 05:32:41] my_main t_env: 160531 / 1000000
+[INFO 05:32:41] my_main Estimated time left: 5 hours, 39 minutes, 15 seconds. Time passed: 1 hours, 13 minutes, 55 seconds
+[INFO 05:33:10] my_main Recent Stats | t_env:     160531 | Episode:     2709
+ep_length_mean:           73.6176	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0437
+grad_norm:                 0.1645	loss:                      0.0070	macro_loss:                0.0607	q_taken_mean:              0.0463
+return_mean:              -0.1071	return_std:                0.3859	target_mean:               0.0428	td_error_abs:              0.0460
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1141	
+[INFO 05:35:53] my_main Updated target value network
+[INFO 05:35:54] my_main Updated target macro network
+[INFO 05:35:54] my_main Updated target network
+[INFO 05:37:01] my_main t_env: 170577 / 1000000
+[INFO 05:37:01] my_main Estimated time left: 5 hours, 58 minutes, 15 seconds. Time passed: 1 hours, 18 minutes, 15 seconds
+[INFO 05:37:31] my_main Recent Stats | t_env:     170577 | Episode:     2840
+ep_length_mean:           75.5776	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0447
+grad_norm:                 0.1199	loss:                      0.0066	macro_loss:                0.0652	q_taken_mean:              0.0446
+return_mean:              -0.0448	return_std:                0.3393	target_mean:               0.0421	td_error_abs:              0.0434
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1290	
+[INFO 05:41:07] my_main t_env: 180612 / 1000000
+[INFO 05:41:07] my_main Estimated time left: 5 hours, 34 minutes, 40 seconds. Time passed: 1 hours, 22 minutes, 21 seconds
+[INFO 05:41:36] my_main Recent Stats | t_env:     180612 | Episode:     2969
+ep_length_mean:           76.4613	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0425
+grad_norm:                 0.0631	loss:                      0.0052	macro_loss:                0.0621	q_taken_mean:              0.0410
+return_mean:              -0.0181	return_std:                0.2983	target_mean:               0.0411	td_error_abs:              0.0382
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1228	
+[INFO 05:42:28] my_main Updated target value network
+[INFO 05:42:28] my_main Updated target macro network
+[INFO 05:42:29] my_main Updated target network
+[INFO 05:45:26] my_main t_env: 190612 / 1000000
+[INFO 05:45:26] my_main Estimated time left: 5 hours, 49 minutes, 24 seconds. Time passed: 1 hours, 26 minutes, 40 seconds
+[INFO 05:45:55] my_main Recent Stats | t_env:     190612 | Episode:     3113
+ep_length_mean:           75.3308	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0734
+grad_norm:                 0.0582	loss:                      0.0049	macro_loss:                0.0603	q_taken_mean:              0.0404
+return_mean:              -0.0291	return_std:                0.3504	target_mean:               0.0406	td_error_abs:              0.0373
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1206	
+[INFO 05:48:09] my_main Updated target value network
+[INFO 05:48:09] my_main Updated target macro network
+[INFO 05:48:09] my_main Updated target network
+[INFO 05:49:50] my_main t_env: 200614 / 1000000
+[INFO 05:49:50] my_main Estimated time left: 5 hours, 51 minutes, 22 seconds. Time passed: 1 hours, 31 minutes, 4 seconds
+[INFO 05:50:19] my_main Recent Stats | t_env:     200614 | Episode:     3263
+ep_length_mean:           73.5435	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.1312
+grad_norm:                 0.0601	loss:                      0.0048	macro_loss:                0.0610	q_taken_mean:              0.0393
+return_mean:              -0.0144	return_std:                0.4225	target_mean:               0.0398	td_error_abs:              0.0369
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1083	
+[INFO 05:54:03] my_main t_env: 210627 / 1000000
+[INFO 05:54:03] my_main Estimated time left: 5 hours, 32 minutes, 16 seconds. Time passed: 1 hours, 35 minutes, 17 seconds
+[INFO 05:54:31] my_main Recent Stats | t_env:     210627 | Episode:     3400
+ep_length_mean:           72.7380	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.2597
+grad_norm:                 0.0678	loss:                      0.0041	macro_loss:                0.0615	q_taken_mean:              0.0372
+return_mean:               0.0927	return_std:                0.5017	target_mean:               0.0384	td_error_abs:              0.0373
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1053	
+[INFO 05:54:32] my_main Updated target value network
+[INFO 05:54:32] my_main Updated target macro network
+[INFO 05:54:32] my_main Updated target network
+[INFO 05:58:26] my_main t_env: 220701 / 1000000
+[INFO 05:58:26] my_main Estimated time left: 5 hours, 39 minutes, 50 seconds. Time passed: 1 hours, 39 minutes, 40 seconds
+[INFO 05:58:56] my_main Recent Stats | t_env:     220701 | Episode:     3552
+ep_length_mean:           70.6558	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3915
+grad_norm:                 0.0734	loss:                      0.0047	macro_loss:                0.0559	q_taken_mean:              0.0375
+return_mean:               0.1747	return_std:                0.5919	target_mean:               0.0389	td_error_abs:              0.0381
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0941	
+[INFO 06:00:09] my_main Updated target value network
+[INFO 06:00:09] my_main Updated target macro network
+[INFO 06:00:10] my_main Updated target network
+[INFO 06:02:42] my_main t_env: 230769 / 1000000
+[INFO 06:02:42] my_main Estimated time left: 5 hours, 25 minutes, 3 seconds. Time passed: 1 hours, 43 minutes, 56 seconds
+[INFO 06:03:12] my_main Recent Stats | t_env:     230769 | Episode:     3693
+ep_length_mean:           69.3785	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5153
+grad_norm:                 0.0634	loss:                      0.0051	macro_loss:                0.0575	q_taken_mean:              0.0382
+return_mean:               0.2591	return_std:                0.6713	target_mean:               0.0384	td_error_abs:              0.0391
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0971	
+[INFO 06:06:09] my_main Updated target value network
+[INFO 06:06:09] my_main Updated target macro network
+[INFO 06:06:09] my_main Updated target network
+[INFO 06:06:54] my_main t_env: 240773 / 1000000
+[INFO 06:06:54] my_main Estimated time left: 5 hours, 18 minutes, 50 seconds. Time passed: 1 hours, 48 minutes, 8 seconds
+[INFO 06:07:21] my_main Recent Stats | t_env:     240773 | Episode:     3828
+ep_length_mean:           70.3104	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.6072
+grad_norm:                 0.0745	loss:                      0.0058	macro_loss:                0.0572	q_taken_mean:              0.0380
+return_mean:               0.3842	return_std:                0.6489	target_mean:               0.0388	td_error_abs:              0.0417
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0959	
+[INFO 06:11:29] my_main t_env: 250790 / 1000000
+[INFO 06:11:29] my_main Estimated time left: 5 hours, 42 minutes, 29 seconds. Time passed: 1 hours, 52 minutes, 42 seconds
+[INFO 06:11:58] my_main Recent Stats | t_env:     250790 | Episode:     3991
+ep_length_mean:           69.2652	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.6854
+grad_norm:                 0.1035	loss:                      0.0063	macro_loss:                0.0565	q_taken_mean:              0.0335
+return_mean:               0.4404	return_std:                0.6466	target_mean:               0.0357	td_error_abs:              0.0449
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.0974	
+[INFO 06:12:12] my_main Updated target value network
+[INFO 06:12:12] my_main Updated target macro network
+[INFO 06:12:13] my_main Updated target network
+[INFO 06:16:01] my_main t_env: 260845 / 1000000
+[INFO 06:16:01] my_main Estimated time left: 5 hours, 34 minutes, 4 seconds. Time passed: 1 hours, 57 minutes, 15 seconds
+[INFO 06:16:31] my_main Recent Stats | t_env:     260845 | Episode:     4154
+ep_length_mean:           66.9851	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7140
+grad_norm:                 0.6370	loss:                      0.0221	macro_loss:                0.0610	q_taken_mean:              0.0547
+return_mean:               0.4163	return_std:                0.6707	target_mean:               0.0456	td_error_abs:              0.0880
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.1094	
+[INFO 06:17:43] my_main Updated target value network
+[INFO 06:17:43] my_main Updated target macro network
+[INFO 06:17:44] my_main Updated target network
+[INFO 06:20:23] my_main t_env: 270893 / 1000000
+[INFO 06:20:23] my_main Estimated time left: 5 hours, 17 minutes, 9 seconds. Time passed: 2 hours, 1 minutes, 37 seconds
+[INFO 06:20:53] my_main Recent Stats | t_env:     270893 | Episode:     4300
+ep_length_mean:           67.4942	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7526
+grad_norm:                 0.6664	loss:                      0.0242	macro_loss:                0.0697	q_taken_mean:              0.0607
+return_mean:               0.4661	return_std:                0.6388	target_mean:               0.0508	td_error_abs:              0.0943
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.1195	
+[INFO 06:23:38] my_main Updated target value network
+[INFO 06:23:38] my_main Updated target macro network
+[INFO 06:23:39] my_main Updated target network
+[INFO 06:24:31] my_main t_env: 280916 / 1000000
+[INFO 06:24:31] my_main Estimated time left: 4 hours, 56 minutes, 8 seconds. Time passed: 2 hours, 5 minutes, 45 seconds
+[INFO 06:25:01] my_main Recent Stats | t_env:     280916 | Episode:     4433
+ep_length_mean:           68.2855	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8029
+grad_norm:                 0.6936	loss:                      0.0268	macro_loss:                0.0701	q_taken_mean:              0.0674
+return_mean:               0.5438	return_std:                0.5904	target_mean:               0.0566	td_error_abs:              0.1012
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1164	
+[INFO 06:28:40] my_main t_env: 290958 / 1000000
+[INFO 06:28:40] my_main Estimated time left: 4 hours, 53 minutes, 10 seconds. Time passed: 2 hours, 9 minutes, 54 seconds
+[INFO 06:29:09] my_main Recent Stats | t_env:     290958 | Episode:     4565
+ep_length_mean:           68.6799	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8030
+grad_norm:                 0.8838	loss:                      0.0311	macro_loss:                0.0716	q_taken_mean:              0.0804
+return_mean:               0.5570	return_std:                0.5910	target_mean:               0.0652	td_error_abs:              0.1146
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1188	
+[INFO 06:30:10] my_main Updated target value network
+[INFO 06:30:10] my_main Updated target macro network
+[INFO 06:30:10] my_main Updated target network
+[INFO 06:32:48] my_main t_env: 300980 / 1000000
+[INFO 06:32:48] my_main Estimated time left: 4 hours, 47 minutes, 46 seconds. Time passed: 2 hours, 14 minutes, 2 seconds
+[INFO 06:33:19] my_main Recent Stats | t_env:     300980 | Episode:     4698
+ep_length_mean:           71.4598	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8219
+grad_norm:                 0.8898	loss:                      0.0330	macro_loss:                0.0716	q_taken_mean:              0.0912
+return_mean:               0.6515	return_std:                0.5535	target_mean:               0.0735	td_error_abs:              0.1184
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1179	
+[INFO 06:36:08] my_main Updated target value network
+[INFO 06:36:08] my_main Updated target macro network
+[INFO 06:36:08] my_main Updated target network
+[INFO 06:36:59] my_main t_env: 311050 / 1000000
+[INFO 06:36:59] my_main Estimated time left: 4 hours, 46 minutes, 28 seconds. Time passed: 2 hours, 18 minutes, 13 seconds
+[INFO 06:37:29] my_main Recent Stats | t_env:     311050 | Episode:     4833
+ep_length_mean:           74.0409	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8545
+grad_norm:                 0.3860	loss:                      0.0198	macro_loss:                0.0673	q_taken_mean:              0.0786
+return_mean:               0.7571	return_std:                0.4936	target_mean:               0.0730	td_error_abs:              0.0844
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.1114	
+[INFO 06:41:09] my_main t_env: 321112 / 1000000
+[INFO 06:41:09] my_main Estimated time left: 4 hours, 41 minutes, 2 seconds. Time passed: 2 hours, 22 minutes, 23 seconds
+[INFO 06:41:38] my_main Recent Stats | t_env:     321112 | Episode:     4962
+ep_length_mean:           75.8765	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8764
+grad_norm:                 0.3992	loss:                      0.0234	macro_loss:                0.0691	q_taken_mean:              0.0888
+return_mean:               0.8283	return_std:                0.3748	target_mean:               0.0843	td_error_abs:              0.0920
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.1187	
+[INFO 06:42:43] my_main Updated target value network
+[INFO 06:42:43] my_main Updated target macro network
+[INFO 06:42:44] my_main Updated target network
+[INFO 06:45:14] my_main t_env: 331174 / 1000000
+[INFO 06:45:14] my_main Estimated time left: 4 hours, 31 minutes, 34 seconds. Time passed: 2 hours, 26 minutes, 28 seconds
+[INFO 06:45:45] my_main Recent Stats | t_env:     331174 | Episode:     5091
+ep_length_mean:           76.4043	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8899
+grad_norm:                 0.4216	loss:                      0.0236	macro_loss:                0.0737	q_taken_mean:              0.0938
+return_mean:               0.8584	return_std:                0.2917	target_mean:               0.0903	td_error_abs:              0.0937
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.1355	
+[INFO 06:48:51] my_main Updated target value network
+[INFO 06:48:51] my_main Updated target macro network
+[INFO 06:48:52] my_main Updated target network
+[INFO 06:49:25] my_main t_env: 341236 / 1000000
+[INFO 06:49:25] my_main Estimated time left: 4 hours, 33 minutes, 50 seconds. Time passed: 2 hours, 30 minutes, 39 seconds
+[INFO 06:49:54] my_main Recent Stats | t_env:     341236 | Episode:     5220
+ep_length_mean:           76.7892	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9505
+grad_norm:                 0.2683	loss:                      0.0221	macro_loss:                0.0757	q_taken_mean:              0.0984
+return_mean:               0.9311	return_std:                0.2036	target_mean:               0.1000	td_error_abs:              0.0891
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.1448	
+[INFO 06:53:32] my_main t_env: 351304 / 1000000
+[INFO 06:53:32] my_main Estimated time left: 4 hours, 25 minutes, 21 seconds. Time passed: 2 hours, 34 minutes, 46 seconds
+[INFO 06:54:02] my_main Recent Stats | t_env:     351304 | Episode:     5350
+ep_length_mean:           77.2077	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9373
+grad_norm:                 0.2919	loss:                      0.0230	macro_loss:                0.0780	q_taken_mean:              0.1200
+return_mean:               0.9254	return_std:                0.1942	target_mean:               0.1216	td_error_abs:              0.0930
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1508	
+[INFO 06:55:28] my_main Updated target value network
+[INFO 06:55:28] my_main Updated target macro network
+[INFO 06:55:28] my_main Updated target network
+[INFO 06:57:41] my_main t_env: 361366 / 1000000
+[INFO 06:57:41] my_main Estimated time left: 4 hours, 22 minutes, 48 seconds. Time passed: 2 hours, 38 minutes, 54 seconds
+[INFO 06:58:09] my_main Recent Stats | t_env:     361366 | Episode:     5479
+ep_length_mean:           77.8892	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9306
+grad_norm:                 0.2726	loss:                      0.0239	macro_loss:                0.0827	q_taken_mean:              0.1421
+return_mean:               0.9291	return_std:                0.1647	target_mean:               0.1420	td_error_abs:              0.0937
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1533	
+[INFO 07:01:30] my_main Updated target value network
+[INFO 07:01:30] my_main Updated target macro network
+[INFO 07:01:31] my_main Updated target network
+[INFO 07:01:45] my_main t_env: 371376 / 1000000
+[INFO 07:01:45] my_main Estimated time left: 4 hours, 16 minutes, 0 seconds. Time passed: 2 hours, 42 minutes, 59 seconds
+[INFO 07:02:15] my_main Recent Stats | t_env:     371376 | Episode:     5609
+ep_length_mean:           77.6892	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9275
+grad_norm:                 0.3611	loss:                      0.0217	macro_loss:                0.0798	q_taken_mean:              0.1576
+return_mean:               0.9229	return_std:                0.2072	target_mean:               0.1536	td_error_abs:              0.0914
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.1446	
+[INFO 07:05:53] my_main t_env: 381438 / 1000000
+[INFO 07:05:53] my_main Estimated time left: 4 hours, 14 minutes, 5 seconds. Time passed: 2 hours, 47 minutes, 7 seconds
+[INFO 07:06:23] my_main Recent Stats | t_env:     381438 | Episode:     5738
+ep_length_mean:           77.6892	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9074
+grad_norm:                 0.3423	loss:                      0.0217	macro_loss:                0.0799	q_taken_mean:              0.1856
+return_mean:               0.9028	return_std:                0.2675	target_mean:               0.1815	td_error_abs:              0.0907
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.1361	
+[INFO 07:08:09] my_main Updated target value network
+[INFO 07:08:09] my_main Updated target macro network
+[INFO 07:08:10] my_main Updated target network
+[INFO 07:10:02] my_main t_env: 391500 / 1000000
+[INFO 07:10:02] my_main Estimated time left: 4 hours, 10 minutes, 56 seconds. Time passed: 2 hours, 51 minutes, 16 seconds
+[INFO 07:10:31] my_main Recent Stats | t_env:     391500 | Episode:     5867
+ep_length_mean:           77.6892	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8671
+grad_norm:                 0.3673	loss:                      0.0211	macro_loss:                0.0850	q_taken_mean:              0.2043
+return_mean:               0.8625	return_std:                0.3313	target_mean:               0.1967	td_error_abs:              0.0887
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.1363	
+[INFO 07:14:06] my_main t_env: 401562 / 1000000
+[INFO 07:14:06] my_main Estimated time left: 4 hours, 1 minutes, 19 seconds. Time passed: 2 hours, 55 minutes, 20 seconds
+[INFO 07:14:34] my_main Recent Stats | t_env:     401562 | Episode:     5996
+ep_length_mean:           77.8000	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8403
+grad_norm:                 0.3511	loss:                      0.0205	macro_loss:                0.0853	q_taken_mean:              0.2154
+return_mean:               0.8373	return_std:                0.3374	target_mean:               0.2090	td_error_abs:              0.0853
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.1485	
+[INFO 07:14:42] my_main Updated target value network
+[INFO 07:14:42] my_main Updated target macro network
+[INFO 07:14:42] my_main Updated target network
+[INFO 07:18:13] my_main t_env: 411624 / 1000000
+[INFO 07:18:13] my_main Estimated time left: 4 hours, 42 seconds. Time passed: 2 hours, 59 minutes, 27 seconds
+[INFO 07:18:43] my_main Recent Stats | t_env:     411624 | Episode:     6125
+ep_length_mean:           77.8000	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8124
+grad_norm:                 0.6234	loss:                      0.0235	macro_loss:                0.1048	q_taken_mean:              0.2328
+return_mean:               0.8094	return_std:                0.3650	target_mean:               0.2215	td_error_abs:              0.0942
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.2314	
+[INFO 07:20:49] my_main Updated target value network
+[INFO 07:20:49] my_main Updated target macro network
+[INFO 07:20:50] my_main Updated target network
+[INFO 07:22:27] my_main t_env: 421641 / 1000000
+[INFO 07:22:27] my_main Estimated time left: 4 hours, 4 minutes, 28 seconds. Time passed: 3 hours, 3 minutes, 41 seconds
+[INFO 07:22:57] my_main Recent Stats | t_env:     421641 | Episode:     6263
+ep_length_mean:           76.9174	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7793
+grad_norm:                 0.4882	loss:                      0.0232	macro_loss:                0.1055	q_taken_mean:              0.2459
+return_mean:               0.7575	return_std:                0.4481	target_mean:               0.2387	td_error_abs:              0.0893
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.2384	
+[INFO 07:26:41] my_main Updated target value network
+[INFO 07:26:41] my_main Updated target macro network
+[INFO 07:26:42] my_main Updated target network
+[INFO 07:26:47] my_main t_env: 431714 / 1000000
+[INFO 07:26:47] my_main Estimated time left: 4 hours, 4 minutes, 26 seconds. Time passed: 3 hours, 8 minutes, 1 seconds
+[INFO 07:27:15] my_main Recent Stats | t_env:     431714 | Episode:     6404
+ep_length_mean:           75.6053	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7129
+grad_norm:                 0.4960	loss:                      0.0218	macro_loss:                0.0976	q_taken_mean:              0.2454
+return_mean:               0.6571	return_std:                0.5383	target_mean:               0.2374	td_error_abs:              0.0856
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.2227	
+[INFO 07:31:02] my_main t_env: 441738 / 1000000
+[INFO 07:31:02] my_main Estimated time left: 3 hours, 56 minutes, 53 seconds. Time passed: 3 hours, 12 minutes, 16 seconds
+[INFO 07:31:28] my_main Recent Stats | t_env:     441738 | Episode:     6534
+ep_length_mean:           75.4269	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7178
+grad_norm:                 0.4657	loss:                      0.0218	macro_loss:                0.1044	q_taken_mean:              0.2509
+return_mean:               0.6559	return_std:                0.5497	target_mean:               0.2460	td_error_abs:              0.0835
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.2234	
+[INFO 07:33:21] my_main Updated target value network
+[INFO 07:33:21] my_main Updated target macro network
+[INFO 07:33:22] my_main Updated target network
+[INFO 07:35:41] my_main t_env: 451749 / 1000000
+[INFO 07:35:41] my_main Estimated time left: 4 hours, 14 minutes, 56 seconds. Time passed: 3 hours, 16 minutes, 55 seconds
+[INFO 07:36:20] my_main Recent Stats | t_env:     451749 | Episode:     6665
+ep_length_mean:           75.1108	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.6992
+grad_norm:                 0.4948	loss:                      0.0219	macro_loss:                0.1037	q_taken_mean:              0.2595
+return_mean:               0.6250	return_std:                0.5689	target_mean:               0.2520	td_error_abs:              0.0826
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.2132	
+[INFO 07:41:02] my_main t_env: 461786 / 1000000
+[INFO 07:41:02] my_main Estimated time left: 4 hours, 46 minutes, 41 seconds. Time passed: 3 hours, 22 minutes, 16 seconds
+[INFO 07:41:39] my_main Recent Stats | t_env:     461786 | Episode:     6798
+ep_length_mean:           74.6041	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.6088
+grad_norm:                 0.2286	loss:                      0.0182	macro_loss:                0.0810	q_taken_mean:              0.2603
+return_mean:               0.5136	return_std:                0.6013	target_mean:               0.2571	td_error_abs:              0.0686
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1324	
+[INFO 07:41:43] my_main Updated target value network
+[INFO 07:41:44] my_main Updated target macro network
+[INFO 07:41:44] my_main Updated target network
+[INFO 07:47:06] my_main t_env: 471835 / 1000000
+[INFO 07:47:06] my_main Estimated time left: 5 hours, 18 minutes, 54 seconds. Time passed: 3 hours, 28 minutes, 20 seconds
+[INFO 07:47:43] my_main Recent Stats | t_env:     471835 | Episode:     6935
+ep_length_mean:           74.7568	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5618
+grad_norm:                 0.2382	loss:                      0.0167	macro_loss:                0.0749	q_taken_mean:              0.2614
+return_mean:               0.4635	return_std:                0.6036	target_mean:               0.2577	td_error_abs:              0.0649
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1193	
+[INFO 07:50:18] my_main Updated target value network
+[INFO 07:50:18] my_main Updated target macro network
+[INFO 07:50:19] my_main Updated target network
+[INFO 07:52:53] my_main t_env: 481873 / 1000000
+[INFO 07:52:53] my_main Estimated time left: 4 hours, 58 minutes, 16 seconds. Time passed: 3 hours, 34 minutes, 7 seconds
+[INFO 07:53:29] my_main Recent Stats | t_env:     481873 | Episode:     7068
+ep_length_mean:           75.5636	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5536
+grad_norm:                 0.2105	loss:                      0.0172	macro_loss:                0.0781	q_taken_mean:              0.2645
+return_mean:               0.4683	return_std:                0.5713	target_mean:               0.2623	td_error_abs:              0.0640
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1281	
+[INFO 07:58:29] my_main t_env: 491912 / 1000000
+[INFO 07:58:29] my_main Estimated time left: 4 hours, 43 minutes, 38 seconds. Time passed: 3 hours, 39 minutes, 43 seconds
+[INFO 07:59:06] my_main Recent Stats | t_env:     491912 | Episode:     7197
+ep_length_mean:           75.7064	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4727
+grad_norm:                 0.1898	loss:                      0.0159	macro_loss:                0.0602	q_taken_mean:              0.2621
+return_mean:               0.3920	return_std:                0.5767	target_mean:               0.2595	td_error_abs:              0.0607
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.1094	
+[INFO 07:59:14] my_main Updated target value network
+[INFO 07:59:14] my_main Updated target macro network
+[INFO 07:59:15] my_main Updated target network
+[INFO 08:04:08] my_main t_env: 501958 / 1000000
+[INFO 08:04:08] my_main Estimated time left: 4 hours, 39 minutes, 55 seconds. Time passed: 3 hours, 45 minutes, 22 seconds
+[INFO 08:04:43] my_main Recent Stats | t_env:     501958 | Episode:     7329
+ep_length_mean:           75.6436	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4371
+grad_norm:                 0.1621	loss:                      0.0146	macro_loss:                0.0530	q_taken_mean:              0.2494
+return_mean:               0.3534	return_std:                0.5612	target_mean:               0.2507	td_error_abs:              0.0593
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0924	
+[INFO 08:07:26] my_main Updated target value network
+[INFO 08:07:26] my_main Updated target macro network
+[INFO 08:07:26] my_main Updated target network
+[INFO 08:09:38] my_main t_env: 511964 / 1000000
+[INFO 08:09:38] my_main Estimated time left: 4 hours, 28 minutes, 52 seconds. Time passed: 3 hours, 50 minutes, 52 seconds
+[INFO 08:10:15] my_main Recent Stats | t_env:     511964 | Episode:     7460
+ep_length_mean:           75.8267	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4579
+grad_norm:                 0.1517	loss:                      0.0139	macro_loss:                0.0482	q_taken_mean:              0.2383
+return_mean:               0.3801	return_std:                0.5583	target_mean:               0.2400	td_error_abs:              0.0557
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0801	
+[INFO 08:15:09] my_main t_env: 522007 / 1000000
+[INFO 08:15:09] my_main Estimated time left: 4 hours, 22 minutes, 23 seconds. Time passed: 3 hours, 56 minutes, 23 seconds
+[INFO 08:15:45] my_main Recent Stats | t_env:     522007 | Episode:     7592
+ep_length_mean:           76.3733	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3851
+grad_norm:                 0.1461	loss:                      0.0137	macro_loss:                0.0497	q_taken_mean:              0.2344
+return_mean:               0.3184	return_std:                0.5208	target_mean:               0.2374	td_error_abs:              0.0537
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0723	
+[INFO 08:16:04] my_main Updated target value network
+[INFO 08:16:04] my_main Updated target macro network
+[INFO 08:16:05] my_main Updated target network
+[INFO 08:20:35] my_main t_env: 532074 / 1000000
+[INFO 08:20:35] my_main Estimated time left: 4 hours, 12 minutes, 40 seconds. Time passed: 4 hours, 1 minutes, 49 seconds
+[INFO 08:21:11] my_main Recent Stats | t_env:     532074 | Episode:     7725
+ep_length_mean:           76.4169	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3429
+grad_norm:                 0.1376	loss:                      0.0132	macro_loss:                0.0446	q_taken_mean:              0.2359
+return_mean:               0.2808	return_std:                0.5147	target_mean:               0.2388	td_error_abs:              0.0516
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0608	
+[INFO 08:23:54] my_main Updated target value network
+[INFO 08:23:54] my_main Updated target macro network
+[INFO 08:23:55] my_main Updated target network
+[INFO 08:26:01] my_main t_env: 542102 / 1000000
+[INFO 08:26:01] my_main Estimated time left: 4 hours, 7 minutes, 27 seconds. Time passed: 4 hours, 7 minutes, 15 seconds
+[INFO 08:26:37] my_main Recent Stats | t_env:     542102 | Episode:     7857
+ep_length_mean:           76.0465	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3123
+grad_norm:                 0.2125	loss:                      0.0137	macro_loss:                0.0433	q_taken_mean:              0.2372
+return_mean:               0.2350	return_std:                0.5253	target_mean:               0.2364	td_error_abs:              0.0552
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0616	
+[INFO 08:31:24] my_main t_env: 552119 / 1000000
+[INFO 08:31:24] my_main Estimated time left: 4 hours, 53 seconds. Time passed: 4 hours, 12 minutes, 38 seconds
+[INFO 08:32:00] my_main Recent Stats | t_env:     552119 | Episode:     7988
+ep_length_mean:           76.1184	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.2930
+grad_norm:                 0.1748	loss:                      0.0122	macro_loss:                0.0393	q_taken_mean:              0.2327
+return_mean:               0.2186	return_std:                0.5255	target_mean:               0.2298	td_error_abs:              0.0489
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0599	
+[INFO 08:32:28] my_main Updated target value network
+[INFO 08:32:29] my_main Updated target macro network
+[INFO 08:32:29] my_main Updated target network
+[INFO 08:36:45] my_main t_env: 562138 / 1000000
+[INFO 08:36:45] my_main Estimated time left: 3 hours, 53 minutes, 57 seconds. Time passed: 4 hours, 17 minutes, 59 seconds
+[INFO 08:37:21] my_main Recent Stats | t_env:     562138 | Episode:     8118
+ep_length_mean:           76.2559	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.2844
+grad_norm:                 0.1601	loss:                      0.0118	macro_loss:                0.0412	q_taken_mean:              0.2395
+return_mean:               0.2207	return_std:                0.5148	target_mean:               0.2369	td_error_abs:              0.0470
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0582	
+[INFO 08:40:22] my_main Updated target value network
+[INFO 08:40:22] my_main Updated target macro network
+[INFO 08:40:23] my_main Updated target network
+[INFO 08:42:09] my_main t_env: 572212 / 1000000
+[INFO 08:42:09] my_main Estimated time left: 3 hours, 49 minutes, 16 seconds. Time passed: 4 hours, 23 minutes, 23 seconds
+[INFO 08:42:45] my_main Recent Stats | t_env:     572212 | Episode:     8249
+ep_length_mean:           76.4194	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3687
+grad_norm:                 0.1623	loss:                      0.0107	macro_loss:                0.0360	q_taken_mean:              0.2353
+return_mean:               0.3110	return_std:                0.5283	target_mean:               0.2315	td_error_abs:              0.0434
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0539	
+[INFO 08:47:29] my_main t_env: 582255 / 1000000
+[INFO 08:47:29] my_main Estimated time left: 3 hours, 41 minutes, 46 seconds. Time passed: 4 hours, 28 minutes, 43 seconds
+[INFO 08:48:05] my_main Recent Stats | t_env:     582255 | Episode:     8379
+ep_length_mean:           76.7318	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4271
+grad_norm:                 0.2068	loss:                      0.0104	macro_loss:                0.0353	q_taken_mean:              0.2276
+return_mean:               0.3829	return_std:                0.5205	target_mean:               0.2253	td_error_abs:              0.0463
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0513	
+[INFO 08:48:55] my_main Updated target value network
+[INFO 08:48:55] my_main Updated target macro network
+[INFO 08:48:56] my_main Updated target network
+[INFO 08:52:58] my_main t_env: 592318 / 1000000
+[INFO 08:52:58] my_main Estimated time left: 3 hours, 42 minutes, 12 seconds. Time passed: 4 hours, 34 minutes, 12 seconds
+[INFO 08:53:34] my_main Recent Stats | t_env:     592318 | Episode:     8513
+ep_length_mean:           76.5573	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4845
+grad_norm:                 0.1544	loss:                      0.0105	macro_loss:                0.0350	q_taken_mean:              0.2333
+return_mean:               0.4376	return_std:                0.5401	target_mean:               0.2354	td_error_abs:              0.0425
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0472	
+[INFO 08:56:46] my_main Updated target value network
+[INFO 08:56:46] my_main Updated target macro network
+[INFO 08:56:47] my_main Updated target network
+[INFO 08:58:23] my_main t_env: 602329 / 1000000
+[INFO 08:58:23] my_main Estimated time left: 3 hours, 35 minutes, 6 seconds. Time passed: 4 hours, 39 minutes, 37 seconds
+[INFO 08:59:00] my_main Recent Stats | t_env:     602329 | Episode:     8646
+ep_length_mean:           76.3183	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5530
+grad_norm:                 0.2399	loss:                      0.0119	macro_loss:                0.0383	q_taken_mean:              0.2414
+return_mean:               0.5002	return_std:                0.5630	target_mean:               0.2409	td_error_abs:              0.0493
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0503	
+[INFO 09:03:49] my_main t_env: 612352 / 1000000
+[INFO 09:03:49] my_main Estimated time left: 3 hours, 30 minutes, 18 seconds. Time passed: 4 hours, 45 minutes, 3 seconds
+[INFO 09:04:25] my_main Recent Stats | t_env:     612352 | Episode:     8777
+ep_length_mean:           76.2067	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.6058
+grad_norm:                 0.3597	loss:                      0.0131	macro_loss:                0.0373	q_taken_mean:              0.2450
+return_mean:               0.5470	return_std:                0.5733	target_mean:               0.2416	td_error_abs:              0.0555
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0497	
+[INFO 09:05:17] my_main Updated target value network
+[INFO 09:05:17] my_main Updated target macro network
+[INFO 09:05:18] my_main Updated target network
+[INFO 09:09:16] my_main t_env: 622402 / 1000000
+[INFO 09:09:16] my_main Estimated time left: 3 hours, 24 minutes, 26 seconds. Time passed: 4 hours, 50 minutes, 30 seconds
+[INFO 09:09:53] my_main Recent Stats | t_env:     622402 | Episode:     8910
+ep_length_mean:           75.9394	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5979
+grad_norm:                 0.3426	loss:                      0.0129	macro_loss:                0.0350	q_taken_mean:              0.2498
+return_mean:               0.5316	return_std:                0.5885	target_mean:               0.2470	td_error_abs:              0.0547
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0484	
+[INFO 09:13:13] my_main Updated target value network
+[INFO 09:13:13] my_main Updated target macro network
+[INFO 09:13:14] my_main Updated target network
+[INFO 09:14:43] my_main t_env: 632411 / 1000000
+[INFO 09:14:43] my_main Estimated time left: 3 hours, 20 minutes, 4 seconds. Time passed: 4 hours, 55 minutes, 56 seconds
+[INFO 09:15:20] my_main Recent Stats | t_env:     632411 | Episode:     9042
+ep_length_mean:           75.6538	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5945
+grad_norm:                 0.3060	loss:                      0.0131	macro_loss:                0.0346	q_taken_mean:              0.2532
+return_mean:               0.5116	return_std:                0.6009	target_mean:               0.2480	td_error_abs:              0.0492
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0480	
+[INFO 09:20:24] my_main t_env: 642485 / 1000000
+[INFO 09:20:24] my_main Estimated time left: 3 hours, 21 minutes, 52 seconds. Time passed: 5 hours, 1 minutes, 38 seconds
+[INFO 09:21:01] my_main Recent Stats | t_env:     642485 | Episode:     9182
+ep_length_mean:           75.0258	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5155
+grad_norm:                 0.2685	loss:                      0.0127	macro_loss:                0.0358	q_taken_mean:              0.2519
+return_mean:               0.4035	return_std:                0.5793	target_mean:               0.2453	td_error_abs:              0.0463
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0479	
+[INFO 09:21:41] my_main Updated target value network
+[INFO 09:21:41] my_main Updated target macro network
+[INFO 09:21:42] my_main Updated target network
+[INFO 09:25:48] my_main t_env: 652507 / 1000000
+[INFO 09:25:48] my_main Estimated time left: 3 hours, 7 minutes, 19 seconds. Time passed: 5 hours, 7 minutes, 2 seconds
+[INFO 09:26:25] my_main Recent Stats | t_env:     652507 | Episode:     9312
+ep_length_mean:           75.3901	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.4044
+grad_norm:                 0.2754	loss:                      0.0135	macro_loss:                0.0346	q_taken_mean:              0.2626
+return_mean:               0.3043	return_std:                0.5047	target_mean:               0.2564	td_error_abs:              0.0447
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0441	
+[INFO 09:29:44] my_main Updated target value network
+[INFO 09:29:45] my_main Updated target macro network
+[INFO 09:29:45] my_main Updated target network
+[INFO 09:31:16] my_main t_env: 662538 / 1000000
+[INFO 09:31:16] my_main Estimated time left: 3 hours, 4 minutes, 10 seconds. Time passed: 5 hours, 12 minutes, 30 seconds
+[INFO 09:31:54] my_main Recent Stats | t_env:     662538 | Episode:     9441
+ep_length_mean:           75.6398	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.2762
+grad_norm:                 0.2368	loss:                      0.0134	macro_loss:                0.0346	q_taken_mean:              0.2612
+return_mean:               0.1852	return_std:                0.4170	target_mean:               0.2603	td_error_abs:              0.0465
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0423	
+[INFO 09:36:43] my_main t_env: 672600 / 1000000
+[INFO 09:36:43] my_main Estimated time left: 2 hours, 57 minutes, 6 seconds. Time passed: 5 hours, 17 minutes, 57 seconds
+[INFO 09:37:21] my_main Recent Stats | t_env:     672600 | Episode:     9570
+ep_length_mean:           76.1270	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.1590
+grad_norm:                 0.2597	loss:                      0.0138	macro_loss:                0.0362	q_taken_mean:              0.2628
+return_mean:               0.0830	return_std:                0.3226	target_mean:               0.2629	td_error_abs:              0.0497
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0421	
+[INFO 09:38:27] my_main Updated target value network
+[INFO 09:38:27] my_main Updated target macro network
+[INFO 09:38:28] my_main Updated target network
+[INFO 09:42:12] my_main t_env: 682670 / 1000000
+[INFO 09:42:12] my_main Estimated time left: 2 hours, 52 minutes, 53 seconds. Time passed: 5 hours, 23 minutes, 26 seconds
+[INFO 09:42:49] my_main Recent Stats | t_env:     682670 | Episode:     9702
+ep_length_mean:           76.2194	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.0438
+grad_norm:                 0.2891	loss:                      0.0139	macro_loss:                0.0335	q_taken_mean:              0.2660
+return_mean:              -0.0215	return_std:                0.2547	target_mean:               0.2680	td_error_abs:              0.0535
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0401	
+[INFO 09:46:26] my_main Updated target value network
+[INFO 09:46:26] my_main Updated target macro network
+[INFO 09:46:27] my_main Updated target network
+[INFO 09:47:52] my_main t_env: 692709 / 1000000
+[INFO 09:47:52] my_main Estimated time left: 2 hours, 53 minutes, 29 seconds. Time passed: 5 hours, 29 minutes, 6 seconds
+[INFO 09:48:28] my_main Recent Stats | t_env:     692709 | Episode:     9839
+ep_length_mean:           76.4835	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.1321
+grad_norm:                 0.3423	loss:                      0.0140	macro_loss:                0.0305	q_taken_mean:              0.2684
+return_mean:               0.0817	return_std:                0.2798	target_mean:               0.2689	td_error_abs:              0.0556
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.0000	test_return_mean:          0.0000
+test_return_std:           0.0000	value_loss:                0.0360	
+[INFO 09:53:20] my_main t_env: 702720 / 1000000
+[INFO 09:53:20] my_main Estimated time left: 2 hours, 42 minutes, 24 seconds. Time passed: 5 hours, 34 minutes, 34 seconds
+[INFO 09:53:54] my_main Recent Stats | t_env:     702720 | Episode:     9971
+ep_length_mean:           76.2332	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.3244
+grad_norm:                 0.2544	loss:                      0.0139	macro_loss:                0.0299	q_taken_mean:              0.2684
+return_mean:               0.2666	return_std:                0.2831	target_mean:               0.2719	td_error_abs:              0.0523
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.2000	test_return_mean:          0.2000
+test_return_std:           0.0000	value_loss:                0.0347	
+[INFO 09:54:59] my_main Updated target value network
+[INFO 09:54:59] my_main Updated target macro network
+[INFO 09:55:00] my_main Updated target network
+[INFO 09:59:06] my_main t_env: 712784 / 1000000
+[INFO 09:59:06] my_main Estimated time left: 2 hours, 44 minutes, 15 seconds. Time passed: 5 hours, 40 minutes, 20 seconds
+[INFO 09:59:39] my_main Recent Stats | t_env:     712784 | Episode:    10122
+ep_length_mean:           74.0110	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.5229
+grad_norm:                 0.2034	loss:                      0.0136	macro_loss:                0.0268	q_taken_mean:              0.2716
+return_mean:               0.3990	return_std:                0.3528	target_mean:               0.2735	td_error_abs:              0.0473
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.0308	
+[INFO 10:02:27] my_main Updated target value network
+[INFO 10:02:27] my_main Updated target macro network
+[INFO 10:02:28] my_main Updated target network
+[INFO 10:04:46] my_main t_env: 722802 / 1000000
+[INFO 10:04:46] my_main Estimated time left: 2 hours, 36 minutes, 52 seconds. Time passed: 5 hours, 46 minutes, 0 seconds
+[INFO 10:05:22] my_main Recent Stats | t_env:     722802 | Episode:    10266
+ep_length_mean:           72.3249	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.7156
+grad_norm:                 0.1893	loss:                      0.0152	macro_loss:                0.0282	q_taken_mean:              0.2795
+return_mean:               0.5362	return_std:                0.4196	target_mean:               0.2808	td_error_abs:              0.0470
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.0322	
+[INFO 10:10:07] my_main Updated target value network
+[INFO 10:10:07] my_main Updated target macro network
+[INFO 10:10:08] my_main Updated target network
+[INFO 10:10:23] my_main t_env: 732868 / 1000000
+[INFO 10:10:23] my_main Estimated time left: 2 hours, 28 minutes, 57 seconds. Time passed: 5 hours, 51 minutes, 37 seconds
+[INFO 10:10:57] my_main Recent Stats | t_env:     732868 | Episode:    10408
+ep_length_mean:           71.2448	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9126
+grad_norm:                 0.1612	loss:                      0.0153	macro_loss:                0.0279	q_taken_mean:              0.2861
+return_mean:               0.7014	return_std:                0.4514	target_mean:               0.2865	td_error_abs:              0.0453
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.0308	
+[INFO 10:15:51] my_main t_env: 742905 / 1000000
+[INFO 10:15:51] my_main Estimated time left: 2 hours, 20 minutes, 14 seconds. Time passed: 5 hours, 57 minutes, 5 seconds
+[INFO 10:16:27] my_main Recent Stats | t_env:     742905 | Episode:    10539
+ep_length_mean:           71.9130	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9943
+grad_norm:                 0.1530	loss:                      0.0167	macro_loss:                0.0316	q_taken_mean:              0.2962
+return_mean:               0.8106	return_std:                0.3541	target_mean:               0.2998	td_error_abs:              0.0479
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0359	
+[INFO 10:18:46] my_main Updated target value network
+[INFO 10:18:47] my_main Updated target macro network
+[INFO 10:18:47] my_main Updated target network
+[INFO 10:21:25] my_main t_env: 752953 / 1000000
+[INFO 10:21:25] my_main Estimated time left: 2 hours, 16 minutes, 55 seconds. Time passed: 6 hours, 2 minutes, 39 seconds
+[INFO 10:22:02] my_main Recent Stats | t_env:     752953 | Episode:    10672
+ep_length_mean:           71.8546	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9943
+grad_norm:                 0.1544	loss:                      0.0178	macro_loss:                0.0320	q_taken_mean:              0.3054
+return_mean:               0.8047	return_std:                0.3625	target_mean:               0.3080	td_error_abs:              0.0469
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0372	
+[INFO 10:26:45] my_main Updated target value network
+[INFO 10:26:45] my_main Updated target macro network
+[INFO 10:26:46] my_main Updated target network
+[INFO 10:26:59] my_main t_env: 763015 / 1000000
+[INFO 10:26:59] my_main Estimated time left: 2 hours, 11 minutes, 0 seconds. Time passed: 6 hours, 8 minutes, 13 seconds
+[INFO 10:27:36] my_main Recent Stats | t_env:     763015 | Episode:    10807
+ep_length_mean:           73.4315	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9943
+grad_norm:                 0.2517	loss:                      0.0193	macro_loss:                0.0321	q_taken_mean:              0.3175
+return_mean:               0.8545	return_std:                0.3249	target_mean:               0.3161	td_error_abs:              0.0505
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0395	
+[INFO 10:32:26] my_main t_env: 773088 / 1000000
+[INFO 10:32:26] my_main Estimated time left: 2 hours, 2 minutes, 48 seconds. Time passed: 6 hours, 13 minutes, 40 seconds
+[INFO 10:33:03] my_main Recent Stats | t_env:     773088 | Episode:    10938
+ep_length_mean:           74.8962	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9985
+grad_norm:                 0.2499	loss:                      0.0195	macro_loss:                0.0289	q_taken_mean:              0.3228
+return_mean:               0.9081	return_std:                0.2677	target_mean:               0.3215	td_error_abs:              0.0506
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0374	
+[INFO 10:35:22] my_main Updated target value network
+[INFO 10:35:23] my_main Updated target macro network
+[INFO 10:35:23] my_main Updated target network
+[INFO 10:37:57] my_main t_env: 783164 / 1000000
+[INFO 10:37:57] my_main Estimated time left: 1 hours, 58 minutes, 47 seconds. Time passed: 6 hours, 19 minutes, 11 seconds
+[INFO 10:38:35] my_main Recent Stats | t_env:     783164 | Episode:    11069
+ep_length_mean:           76.1019	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9985
+grad_norm:                 0.3048	loss:                      0.0211	macro_loss:                0.0288	q_taken_mean:              0.3343
+return_mean:               0.9413	return_std:                0.2254	target_mean:               0.3305	td_error_abs:              0.0523
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0398	
+[INFO 10:43:29] my_main t_env: 793215 / 1000000
+[INFO 10:43:29] my_main Estimated time left: 1 hours, 53 minutes, 37 seconds. Time passed: 6 hours, 24 minutes, 43 seconds
+[INFO 10:44:05] my_main Recent Stats | t_env:     793215 | Episode:    11200
+ep_length_mean:           76.1233	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9985
+grad_norm:                 0.3356	loss:                      0.0207	macro_loss:                0.0237	q_taken_mean:              0.3357
+return_mean:               0.9413	return_std:                0.2254	target_mean:               0.3282	td_error_abs:              0.0499
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0361	
+[INFO 10:44:07] my_main Updated target value network
+[INFO 10:44:07] my_main Updated target macro network
+[INFO 10:44:08] my_main Updated target network
+[INFO 10:48:58] my_main t_env: 803271 / 1000000
+[INFO 10:48:58] my_main Estimated time left: 1 hours, 47 minutes, 10 seconds. Time passed: 6 hours, 30 minutes, 11 seconds
+[INFO 10:49:35] my_main Recent Stats | t_env:     803271 | Episode:    11331
+ep_length_mean:           76.3662	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       1.0000
+grad_norm:                 0.3334	loss:                      0.0203	macro_loss:                0.0232	q_taken_mean:              0.3346
+return_mean:               0.9563	return_std:                0.1985	target_mean:               0.3281	td_error_abs:              0.0516
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0357	
+[INFO 10:52:10] my_main Updated target value network
+[INFO 10:52:10] my_main Updated target macro network
+[INFO 10:52:10] my_main Updated target network
+[INFO 10:54:30] my_main t_env: 813300 / 1000000
+[INFO 10:54:30] my_main Estimated time left: 1 hours, 43 minutes, 15 seconds. Time passed: 6 hours, 35 minutes, 44 seconds
+[INFO 10:55:06] my_main Recent Stats | t_env:     813300 | Episode:    11463
+ep_length_mean:           76.6550	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9985
+grad_norm:                 0.2777	loss:                      0.0195	macro_loss:                0.0233	q_taken_mean:              0.3294
+return_mean:               0.9528	return_std:                0.2031	target_mean:               0.3281	td_error_abs:              0.0522
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.0379	
+[INFO 11:00:02] my_main t_env: 823371 / 1000000
+[INFO 11:00:02] my_main Estimated time left: 1 hours, 36 minutes, 49 seconds. Time passed: 6 hours, 41 minutes, 15 seconds
+[INFO 11:00:38] my_main Recent Stats | t_env:     823371 | Episode:    11596
+ep_length_mean:           76.4207	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9534
+grad_norm:                 0.2892	loss:                      0.0195	macro_loss:                0.0235	q_taken_mean:              0.3304
+return_mean:               0.8913	return_std:                0.2634	target_mean:               0.3281	td_error_abs:              0.0515
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.0383	
+[INFO 11:00:48] my_main Updated target value network
+[INFO 11:00:48] my_main Updated target macro network
+[INFO 11:00:49] my_main Updated target network
+[INFO 11:05:34] my_main t_env: 833390 / 1000000
+[INFO 11:05:34] my_main Estimated time left: 1 hours, 32 minutes, 11 seconds. Time passed: 6 hours, 46 minutes, 48 seconds
+[INFO 11:06:11] my_main Recent Stats | t_env:     833390 | Episode:    11729
+ep_length_mean:           76.1037	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8977
+grad_norm:                 0.2652	loss:                      0.0189	macro_loss:                0.0242	q_taken_mean:              0.3308
+return_mean:               0.8252	return_std:                0.3246	target_mean:               0.3292	td_error_abs:              0.0502
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.0375	
+[INFO 11:08:45] my_main Updated target value network
+[INFO 11:08:45] my_main Updated target macro network
+[INFO 11:08:46] my_main Updated target network
+[INFO 11:11:13] my_main t_env: 843430 / 1000000
+[INFO 11:11:13] my_main Estimated time left: 1 hours, 27 minutes, 57 seconds. Time passed: 6 hours, 52 minutes, 27 seconds
+[INFO 11:11:49] my_main Recent Stats | t_env:     843430 | Episode:    11866
+ep_length_mean:           75.4156	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8788
+grad_norm:                 0.1966	loss:                      0.0200	macro_loss:                0.0252	q_taken_mean:              0.3392
+return_mean:               0.7773	return_std:                0.3790	target_mean:               0.3397	td_error_abs:              0.0491
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.0371	
+[INFO 11:16:39] my_main Updated target value network
+[INFO 11:16:39] my_main Updated target macro network
+[INFO 11:16:40] my_main Updated target network
+[INFO 11:16:56] my_main t_env: 853494 / 1000000
+[INFO 11:16:56] my_main Estimated time left: 1 hours, 23 minutes, 13 seconds. Time passed: 6 hours, 58 minutes, 10 seconds
+[INFO 11:17:33] my_main Recent Stats | t_env:     853494 | Episode:    12009
+ep_length_mean:           74.1384	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8592
+grad_norm:                 0.2793	loss:                      0.0204	macro_loss:                0.0259	q_taken_mean:              0.3361
+return_mean:               0.7065	return_std:                0.4419	target_mean:               0.3386	td_error_abs:              0.0557
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.4000	test_return_mean:          0.4000
+test_return_std:           0.0000	value_loss:                0.0380	
+[INFO 11:22:33] my_main t_env: 863515 / 1000000
+[INFO 11:22:33] my_main Estimated time left: 1 hours, 16 minutes, 28 seconds. Time passed: 7 hours, 3 minutes, 46 seconds
+[INFO 11:23:10] my_main Recent Stats | t_env:     863515 | Episode:    12149
+ep_length_mean:           73.2587	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.8593
+grad_norm:                 0.2596	loss:                      0.0210	macro_loss:                0.0265	q_taken_mean:              0.3455
+return_mean:               0.6891	return_std:                0.4592	target_mean:               0.3446	td_error_abs:              0.0507
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.6000	test_return_mean:          0.6000
+test_return_std:           0.0000	value_loss:                0.0357	
+[INFO 11:24:59] my_main Updated target value network
+[INFO 11:25:00] my_main Updated target macro network
+[INFO 11:25:00] my_main Updated target network
+[INFO 11:28:09] my_main t_env: 873529 / 1000000
+[INFO 11:28:09] my_main Estimated time left: 1 hours, 10 minutes, 50 seconds. Time passed: 7 hours, 9 minutes, 23 seconds
+[INFO 11:28:47] my_main Recent Stats | t_env:     873529 | Episode:    12285
+ep_length_mean:           72.8408	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9029
+grad_norm:                 0.2596	loss:                      0.0204	macro_loss:                0.0265	q_taken_mean:              0.3428
+return_mean:               0.7215	return_std:                0.4408	target_mean:               0.3432	td_error_abs:              0.0524
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  0.8000	test_return_mean:          0.8000
+test_return_std:           0.0000	value_loss:                0.0360	
+[INFO 11:33:06] my_main Updated target value network
+[INFO 11:33:07] my_main Updated target macro network
+[INFO 11:33:07] my_main Updated target network
+[INFO 11:33:36] my_main t_env: 883578 / 1000000
+[INFO 11:33:36] my_main Estimated time left: 1 hours, 3 minutes, 4 seconds. Time passed: 7 hours, 14 minutes, 50 seconds
+[INFO 11:34:14] my_main Recent Stats | t_env:     883578 | Episode:    12414
+ep_length_mean:           73.3545	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9585
+grad_norm:                 0.2664	loss:                      0.0218	macro_loss:                0.0265	q_taken_mean:              0.3465
+return_mean:               0.7921	return_std:                0.3660	target_mean:               0.3497	td_error_abs:              0.0565
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0353	
+[INFO 11:39:05] my_main t_env: 893622 / 1000000
+[INFO 11:39:05] my_main Estimated time left: 58 minutes, 8 seconds. Time passed: 7 hours, 20 minutes, 19 seconds
+[INFO 11:39:43] my_main Recent Stats | t_env:     893622 | Episode:    12543
+ep_length_mean:           74.2697	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9744
+grad_norm:                 0.2546	loss:                      0.0205	macro_loss:                0.0253	q_taken_mean:              0.3398
+return_mean:               0.8415	return_std:                0.3073	target_mean:               0.3430	td_error_abs:              0.0560
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0337	
+[INFO 11:41:49] my_main Updated target value network
+[INFO 11:41:49] my_main Updated target macro network
+[INFO 11:41:50] my_main Updated target network
+[INFO 11:44:35] my_main t_env: 903631 / 1000000
+[INFO 11:44:35] my_main Estimated time left: 52 minutes, 59 seconds. Time passed: 7 hours, 25 minutes, 49 seconds
+[INFO 11:45:12] my_main Recent Stats | t_env:     903631 | Episode:    12673
+ep_length_mean:           75.5926	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9894
+grad_norm:                 0.2715	loss:                      0.0207	macro_loss:                0.0236	q_taken_mean:              0.3475
+return_mean:               0.9092	return_std:                0.2588	target_mean:               0.3459	td_error_abs:              0.0520
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0317	
+[INFO 11:49:59] my_main Updated target value network
+[INFO 11:50:00] my_main Updated target macro network
+[INFO 11:50:00] my_main Updated target network
+[INFO 11:50:03] my_main t_env: 913675 / 1000000
+[INFO 11:50:03] my_main Estimated time left: 46 minutes, 52 seconds. Time passed: 7 hours, 31 minutes, 17 seconds
+[INFO 11:50:39] my_main Recent Stats | t_env:     913675 | Episode:    12802
+ep_length_mean:           76.8490	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9862
+grad_norm:                 0.2528	loss:                      0.0194	macro_loss:                0.0211	q_taken_mean:              0.3372
+return_mean:               0.9415	return_std:                0.2225	target_mean:               0.3378	td_error_abs:              0.0527
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0288	
+[INFO 11:55:27] my_main t_env: 923711 / 1000000
+[INFO 11:55:27] my_main Estimated time left: 41 minutes, 8 seconds. Time passed: 7 hours, 36 minutes, 41 seconds
+[INFO 11:56:05] my_main Recent Stats | t_env:     923711 | Episode:    12931
+ep_length_mean:           77.6822	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9876
+grad_norm:                 0.2631	loss:                      0.0189	macro_loss:                0.0206	q_taken_mean:              0.3337
+return_mean:               0.9753	return_std:                0.1638	target_mean:               0.3327	td_error_abs:              0.0493
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0267	
+[INFO 11:58:37] my_main Updated target value network
+[INFO 11:58:37] my_main Updated target macro network
+[INFO 11:58:38] my_main Updated target network
+[INFO 12:00:51] my_main t_env: 933742 / 1000000
+[INFO 12:00:51] my_main Estimated time left: 35 minutes, 38 seconds. Time passed: 7 hours, 42 minutes, 5 seconds
+[INFO 12:01:29] my_main Recent Stats | t_env:     933742 | Episode:    13060
+ep_length_mean:           77.6543	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9876
+grad_norm:                 0.2420	loss:                      0.0168	macro_loss:                0.0215	q_taken_mean:              0.3216
+return_mean:               0.9768	return_std:                0.1567	target_mean:               0.3201	td_error_abs:              0.0457
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0293	
+[INFO 12:06:15] my_main t_env: 943785 / 1000000
+[INFO 12:06:15] my_main Estimated time left: 30 minutes, 14 seconds. Time passed: 7 hours, 47 minutes, 29 seconds
+[INFO 12:06:53] my_main Recent Stats | t_env:     943785 | Episode:    13189
+ep_length_mean:           77.6527	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9907
+grad_norm:                 0.2544	loss:                      0.0166	macro_loss:                0.0213	q_taken_mean:              0.3184
+return_mean:               0.9799	return_std:                0.1441	target_mean:               0.3175	td_error_abs:              0.0452
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0276	
+[INFO 12:07:20] my_main Updated target value network
+[INFO 12:07:20] my_main Updated target macro network
+[INFO 12:07:21] my_main Updated target network
+[INFO 12:11:41] my_main t_env: 953831 / 1000000
+[INFO 12:11:41] my_main Estimated time left: 24 minutes, 54 seconds. Time passed: 7 hours, 52 minutes, 55 seconds
+[INFO 12:12:18] my_main Recent Stats | t_env:     953831 | Episode:    13320
+ep_length_mean:           77.5917	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       0.9953
+grad_norm:                 0.1442	loss:                      0.0148	macro_loss:                0.0200	q_taken_mean:              0.3029
+return_mean:               0.9785	return_std:                0.1403	target_mean:               0.3044	td_error_abs:              0.0403
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0252	
+[INFO 12:15:19] my_main Updated target value network
+[INFO 12:15:19] my_main Updated target macro network
+[INFO 12:15:20] my_main Updated target network
+[INFO 12:17:08] my_main t_env: 963893 / 1000000
+[INFO 12:17:08] my_main Estimated time left: 19 minutes, 35 seconds. Time passed: 7 hours, 58 minutes, 22 seconds
+[INFO 12:17:45] my_main Recent Stats | t_env:     963893 | Episode:    13449
+ep_length_mean:           77.6196	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       1.0000
+grad_norm:                 0.1120	loss:                      0.0139	macro_loss:                0.0198	q_taken_mean:              0.2973
+return_mean:               0.9847	return_std:                0.0976	target_mean:               0.2980	td_error_abs:              0.0369
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0247	
+[INFO 12:22:26] my_main t_env: 973930 / 1000000
+[INFO 12:22:26] my_main Estimated time left: 13 minutes, 44 seconds. Time passed: 8 hours, 3 minutes, 40 seconds
+[INFO 12:23:02] my_main Recent Stats | t_env:     973930 | Episode:    13578
+ep_length_mean:           77.6211	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       1.0000
+grad_norm:                 0.1470	loss:                      0.0142	macro_loss:                0.0199	q_taken_mean:              0.2944
+return_mean:               0.9831	return_std:                0.1048	target_mean:               0.2942	td_error_abs:              0.0395
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0250	
+[INFO 12:23:50] my_main Updated target value network
+[INFO 12:23:50] my_main Updated target macro network
+[INFO 12:23:51] my_main Updated target network
+[INFO 12:27:32] my_main t_env: 983992 / 1000000
+[INFO 12:27:32] my_main Estimated time left: 8 minutes, 6 seconds. Time passed: 8 hours, 8 minutes, 45 seconds
+[INFO 12:28:04] my_main Recent Stats | t_env:     983992 | Episode:    13707
+ep_length_mean:           77.6692	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       1.0000
+grad_norm:                 0.1139	loss:                      0.0142	macro_loss:                0.0178	q_taken_mean:              0.2905
+return_mean:               0.9847	return_std:                0.0872	target_mean:               0.2893	td_error_abs:              0.0363
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0208	
+[INFO 12:30:58] my_main Updated target value network
+[INFO 12:30:58] my_main Updated target macro network
+[INFO 12:30:59] my_main Updated target network
+[INFO 12:32:02] my_main t_env: 994000 / 1000000
+[INFO 12:32:02] my_main Estimated time left: 2 minutes, 41 seconds. Time passed: 8 hours, 13 minutes, 15 seconds
+[INFO 12:32:32] my_main Recent Stats | t_env:     994000 | Episode:    13836
+ep_length_mean:           77.6149	epsilon:                   0.0500	exit_rate_mean:            0.0000	gems_collected_mean:       1.0000
+grad_norm:                 0.1358	loss:                      0.0126	macro_loss:                0.0163	q_taken_mean:              0.2774
+return_mean:               0.9847	return_std:                0.0872	target_mean:               0.2747	td_error_abs:              0.0339
+test_ep_length_mean:      78.0000	test_exit_rate_mean:       0.0000	test_gems_collected_mean:  1.0000	test_return_mean:          1.0000
+test_return_std:           0.0000	value_loss:                0.0190	

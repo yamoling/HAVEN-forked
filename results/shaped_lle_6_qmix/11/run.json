@@ -1,0 +1,159 @@
+{
+  "artifacts": [],
+  "command": "my_main",
+  "experiment": {
+    "base_dir": "/workspaces/HAVEN-forked/src",
+    "dependencies": [
+      "numpy==2.2.0",
+      "PyYAML==6.0.2",
+      "sacred==0.8.7",
+      "torch==2.5.1+cu118"
+    ],
+    "mainfile": "main.py",
+    "name": "pymarl",
+    "repositories": [
+      {
+        "commit": "7d43c7e464ce80c791c881c921276dac23aa0224",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      },
+      {
+        "commit": "7d43c7e464ce80c791c881c921276dac23aa0224",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      },
+      {
+        "commit": "7d43c7e464ce80c791c881c921276dac23aa0224",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      }
+    ],
+    "sources": [
+      [
+        "main.py",
+        "_sources/main_19e8b31f0f913ab795c5c273a47154ab.py"
+      ],
+      [
+        "run.py",
+        "_sources/run_3f214b756e95b1eb26112363ec9f16fb.py"
+      ],
+      [
+        "utils/logging.py",
+        "_sources/logging_38e7c3c11a8722f1c40f9bab14330d30.py"
+      ]
+    ]
+  },
+  "fail_trace": [
+    "Traceback (most recent call last):\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/sacred/config/captured_function.py\", line 42, in captured_function\n    result = wrapped(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n",
+    "  File \"/workspaces/HAVEN-forked/src/main.py\", line 38, in my_main\n    run(_run, config, _log)\n",
+    "  File \"/workspaces/HAVEN-forked/src/run.py\", line 56, in run\n    run_sequential(args=args, logger=logger)\n",
+    "  File \"/workspaces/HAVEN-forked/src/run.py\", line 180, in run_sequential\n    learner.to(args.device)\n",
+    "  File \"/workspaces/HAVEN-forked/src/learners/q_learner.py\", line 125, in to\n    self.mac.to(device)\n",
+    "  File \"/workspaces/HAVEN-forked/src/controllers/controller.py\", line 14, in to\n    self.agent.to(device)\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1340, in to\n    return self._apply(convert)\n           ^^^^^^^^^^^^^^^^^^^^\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 900, in _apply\n    module._apply(fn)\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 900, in _apply\n    module._apply(fn)\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 927, in _apply\n    param_applied = fn(param)\n                    ^^^^^^^^^\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1326, in convert\n    return t.to(\n           ^^^^^\n",
+    "RuntimeError: CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
+  ],
+  "heartbeat": "2024-12-29T09:50:23.718116",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz",
+    "gpus": {
+      "driver_version": "470.256.02",
+      "gpus": [
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11177
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        }
+      ]
+    },
+    "hostname": "f3400f87bc47",
+    "os": [
+      "Linux",
+      "Linux-6.8.0-48-generic-x86_64-with-glibc2.31"
+    ],
+    "python_version": "3.12.8"
+  },
+  "meta": {
+    "command": "my_main",
+    "config_updates": {
+      "env_args": {
+        "seed": 7
+      }
+    },
+    "named_configs": [],
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--id": null,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "env_args.seed=7"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2024-12-29T09:50:16.922544",
+  "status": "FAILED",
+  "stop_time": "2024-12-29T09:50:23.720846"
+}

@@ -1,0 +1,154 @@
+{
+  "artifacts": [],
+  "command": "my_main",
+  "experiment": {
+    "base_dir": "/workspaces/HAVEN-forked/src",
+    "dependencies": [
+      "numpy==2.2.0",
+      "PyYAML==6.0.2",
+      "sacred==0.8.7",
+      "torch==2.5.1+cu118"
+    ],
+    "mainfile": "main.py",
+    "name": "pymarl",
+    "repositories": [
+      {
+        "commit": "322293b1d662ef2b2e6ee6ef9ff185b1a69f8ec1",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      },
+      {
+        "commit": "322293b1d662ef2b2e6ee6ef9ff185b1a69f8ec1",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      },
+      {
+        "commit": "322293b1d662ef2b2e6ee6ef9ff185b1a69f8ec1",
+        "dirty": true,
+        "url": "https://github.com/yamoling/HAVEN-forked.git"
+      }
+    ],
+    "sources": [
+      [
+        "main.py",
+        "_sources/main_46cfb144b299ebf9be887f83891115d2.py"
+      ],
+      [
+        "run.py",
+        "_sources/run_6695b7b4ec672d57ec357fd87f97de4e.py"
+      ],
+      [
+        "utils/logging.py",
+        "_sources/logging_38e7c3c11a8722f1c40f9bab14330d30.py"
+      ]
+    ]
+  },
+  "fail_trace": [
+    "Traceback (most recent call last):\n",
+    "  File \"/workspaces/HAVEN-forked/.venv/lib/python3.12/site-packages/sacred/config/captured_function.py\", line 42, in captured_function\n    result = wrapped(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n",
+    "  File \"/workspaces/HAVEN-forked/src/main.py\", line 38, in my_main\n    run(_run, config, _log)\n",
+    "  File \"/workspaces/HAVEN-forked/src/run.py\", line 58, in run\n    run_sequential(args=args, logger=logger)\n",
+    "  File \"/workspaces/HAVEN-forked/src/run.py\", line 235, in run_sequential\n    episode_batch, macro_episode_batch = runner.run(test_mode=False)\n                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+    "  File \"/workspaces/HAVEN-forked/src/runners/episode_runner.py\", line 128, in run\n    self.batch.update(pre_transition_data, ts=self.t)\n",
+    "  File \"/workspaces/HAVEN-forked/src/components/episode_buffer.py\", line 96, in update\n    v = th.tensor(v, dtype=dtype, device=self.device)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+    "TypeError: 'numpy.float32' object cannot be interpreted as an integer\n"
+  ],
+  "heartbeat": "2025-01-01T19:32:51.233164",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz",
+    "gpus": {
+      "driver_version": "470.256.02",
+      "gpus": [
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11177
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        },
+        {
+          "model": "NVIDIA GeForce GTX 1080 Ti",
+          "persistence_mode": false,
+          "total_memory": 11178
+        }
+      ]
+    },
+    "hostname": "f3400f87bc47",
+    "os": [
+      "Linux",
+      "Linux-6.8.0-48-generic-x86_64-with-glibc2.31"
+    ],
+    "python_version": "3.12.8"
+  },
+  "meta": {
+    "command": "my_main",
+    "config_updates": {
+      "env_args": {
+        "seed": 1
+      }
+    },
+    "named_configs": [],
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--id": null,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "env_args.seed=1"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2025-01-01T19:32:09.410158",
+  "status": "FAILED",
+  "stop_time": "2025-01-01T19:32:51.239896"
+}
