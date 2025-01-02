@@ -1,5 +1,5 @@
 #!/bin/bash
-envs=("lle")
+envs=("lle-lvl6")
 configs=("haven-cnn-vdn-no-ir")
 n_seeds=8
 n_concurrent=16
