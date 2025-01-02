@@ -1,3 +1,4 @@
+from typing import Any
 from modules.agents import REGISTRY as agent_REGISTRY
 import torch as th
 from .controller import Controller
@@ -74,8 +75,9 @@ class ValueMAC(Controller):
         extras_shape = 0
         if self.args.obs_last_action:
             extras_shape += scheme["macro_actions_onehot"]["vshape"][0]
-        if "laser_shaping" in scheme:
-            extras_shape += scheme["laser_shaping"]["vshape"][0]
+        # There is no laser_shaping for the ValueMAC, although it may be encoded in the last_action
+        # if "laser_shaping" in scheme:
+        #     extras_shape += scheme["laser_shaping"]["vshape"][0]
         if self.args.obs_agent_id:
             extras_shape += self.n_agents
 

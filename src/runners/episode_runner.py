@@ -6,7 +6,7 @@ import torch
 from marlenv.adapters import PymarlAdapter
 
 from components.episode_buffer import EpisodeBatch
-from controllers import BasicMAC
+from controllers import BasicMAC, MacroMAC, ValueMAC
 from envs import REGISTRY as env_REGISTRY
 from envs import LLEPotentialShaping, MultiAgentEnv
 
@@ -37,7 +37,18 @@ class EpisodeRunner:
         # Log the first run
         self.log_train_stats_t = -1000000
 
-    def setup(self, scheme, macro_scheme, groups, preprocess, macro_preprocess, mac, macro_mac, value_mac, learner):
+    def setup(
+        self,
+        scheme,
+        macro_scheme,
+        groups,
+        preprocess,
+        macro_preprocess,
+        mac,
+        macro_mac: MacroMAC | None,
+        value_mac: ValueMAC | None,
+        learner,
+    ):
         self.new_batch = partial(
             EpisodeBatch, scheme, groups, self.batch_size, self.episode_limit + 1, preprocess=preprocess, device=self.args.device
         )
@@ -73,6 +84,12 @@ class EpisodeRunner:
         self.env.reset()
         self.t = 0
 
+    def get_laser_shaping(self):
+        assert isinstance(self.env, PymarlAdapter)
+        shaping = self.env.env.wrapped
+        assert isinstance(shaping, LLEPotentialShaping)
+        return shaping.get_laser_shaping()
+
     def run(self, test_mode=False):
         self.reset()
 
@@ -93,10 +110,7 @@ class EpisodeRunner:
                 "obs": [self.env.get_obs()],
             }
             if "laser_shaping" in self.batch.scheme:
-                assert isinstance(self.env, PymarlAdapter)
-                shaping = self.env.env.wrapped
-                assert isinstance(shaping, LLEPotentialShaping)
-                pre_transition_data["laser_shaping"] = [shaping.get_laser_shaping()]
+                pre_transition_data["laser_shaping"] = [self.get_laser_shaping()]
             self.batch.update(pre_transition_data, ts=self.t)
 
             if self.macro_batch is not None and self.t % self.args.k == 0:
@@ -113,7 +127,7 @@ class EpisodeRunner:
                 macro_reward = 0
                 self.macro_batch.update(post_macro_transition_data, ts=self.t // self.args.k - 1)
             if self.macro_batch is not None and self.t % self.args.k == 0:
-                if self.args.enable_haven_subgoals:
+                if self.macro_mac is not None:
                     macro_actions = self.macro_mac.select_actions(
                         self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
                     )
@@ -164,8 +178,11 @@ class EpisodeRunner:
         self.batch.update(last_data, ts=self.t)
 
         # Select actions in the last stored state
-        if self.macro_mac is not None and self.macro_batch is not None:
-            macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
+        if self.macro_batch is not None:
+            if self.macro_mac is not None:
+                macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
+            else:
+                macro_actions = self.get_laser_shaping()
             pre_transition_data = {
                 "subgoals": macro_actions,
             }

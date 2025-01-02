@@ -112,12 +112,6 @@ def run_sequential(args, logger):
         "subgoals": {"vshape": (1,), "group": "agents", "dtype": th.long},
     }
 
-    match runner.env:
-        case PymarlAdapter() as env:
-            wrapped = env.env.wrapped
-            if isinstance(wrapped, LLEPotentialShaping) and wrapped.enable_extras:
-                scheme["laser_shaping"] = {"vshape": (wrapped.agents_pos_reached.shape[1],), "group": "agents", "dtype": th.float32}
-
     macro_scheme = {
         "state": {"vshape": env_info["state_shape"]},
         "obs": {"vshape": env_info["obs_shape"], "group": "agents"},
@@ -125,6 +119,15 @@ def run_sequential(args, logger):
         "macro_reward": {"vshape": (1,)},
         "terminated": {"vshape": (1,), "dtype": th.uint8},
     }
+
+    if isinstance(runner.env, PymarlAdapter):
+        wrapped = runner.env.env.wrapped
+        if isinstance(wrapped, LLEPotentialShaping) and wrapped.enable_extras:
+            shape = wrapped.get_laser_shaping().shape[1]
+            scheme["laser_shaping"] = {"vshape": (shape,), "group": "agents", "dtype": th.float32}
+            if not args.enable_haven_subgoals:
+                macro_scheme["macro_actions"] = {"vshape": (shape,), "group": "agents", "dtype": th.float32}
+
     groups = {"agents": args.n_agents}
     preprocess: dict = {
         "actions": ("actions_onehot", [OneHot(out_dim=args.n_actions)]),
@@ -135,11 +138,23 @@ def run_sequential(args, logger):
             preprocess["subgoals"] = ("subgoals_onehot", [OneHot(out_dim=args.n_subgoals)])
             macro_preprocess["macro_actions"] = ("macro_actions_onehot", [OneHot(out_dim=args.n_subgoals)])
         else:
-            # Dans ce cas-ci, c'est qu'on va remplacer les subgoals de Haven par les subgoals de l'environnement
-            preprocess["subgoals"] = ("subgoals_onehot", [NoTransform()])
-            macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform()])
-            # TODO: s'assurer que le nombre de subgoals correspond à celui de l'environnement
-            raise NotImplementedError("Double check the implementation before running !")
+            assert isinstance(runner.env, PymarlAdapter)
+            wrapped = runner.env.env.wrapped
+            assert isinstance(wrapped, LLEPotentialShaping)
+            shaped_subgoals = wrapped.get_laser_shaping()
+            # If the haven subgoals are disabled, we use the subgoals of the environment
+            scheme["subgoals"] = {"vshape": shaped_subgoals.shape[1], "group": "agents", "dtype": th.float32}
+            preprocess["subgoals"] = ("subgoals_onehot", [NoTransform(shaped_subgoals.shape[1])])
+            macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform(shaped_subgoals.shape[1])])
+    # else:
+    # Check if we have to substitute the subgoals of Haven by the subgoals of the environment
+    # assert isinstance(env, PymarlAdapter)
+    # wrapped = env.env.wrapped
+    # assert isinstance(wrapped, LLEPotentialShaping)
+    # assert args.n_subgoals == wrapped.get_laser_shaping().shape[1]
+    # # Dans ce cas-ci, c'est qu'on va remplacer les subgoals de Haven par les subgoals de l'environnement
+    # preprocess["subgoals"] = ("subgoals_onehot", [NoTransform(args.n_subgoals)])
+    # macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform(args.n_subgoals)])
 
     buffer = ReplayBuffer(
         scheme,
@@ -159,7 +174,10 @@ def run_sequential(args, logger):
             preprocess=macro_preprocess,
             device="cpu" if args.buffer_cpu_only else args.device,
         )
-        macro_mac = mac_REGISTRY[args.macro_mac](macro_buffer.scheme, groups, args)
+        if args.enable_haven_subgoals:
+            macro_mac = mac_REGISTRY[args.macro_mac](macro_buffer.scheme, groups, args)
+        else:
+            macro_mac = None
         if args.train_value:
             value_mac = mac_REGISTRY["value_mac"](macro_buffer.scheme, groups, args)
         else:

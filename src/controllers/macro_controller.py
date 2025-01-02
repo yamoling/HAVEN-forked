@@ -31,7 +31,6 @@ class MacroMAC(Controller):
         agent_inputs = self._build_inputs(ep_batch, t)
         # avail_actions = ep_batch["avail_actions"][:, t]
         agent_outputs, self.hidden_states = self.agent(agent_inputs, self.hidden_states)
-
         return agent_outputs.view(ep_batch.batch_size, self.n_agents, -1)
 
     def init_hidden(self, batch_size):

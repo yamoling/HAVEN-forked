@@ -8,7 +8,7 @@ from controllers import ValueMAC, MacroMAC, BasicMAC
 
 
 class HAVENLearner:
-    def __init__(self, mac: BasicMAC, macro_mac: MacroMAC, value_mac: ValueMAC | None, scheme, logger, args):
+    def __init__(self, mac: BasicMAC, macro_mac: MacroMAC | None, value_mac: ValueMAC | None, scheme, logger, args):
         self.args = args
         self.mac = mac
         self.macro_mac = macro_mac
@@ -19,7 +19,9 @@ class HAVENLearner:
             assert value_mac is not None
 
         self.params = list(mac.parameters())
-        self.macro_params = list(macro_mac.parameters())
+        self.macro_params = list[th.nn.Parameter]()
+        if macro_mac is not None:
+            self.macro_params = list(macro_mac.parameters())
         self.value_params = list[th.nn.Parameter]()
         if value_mac is not None:
             self.value_params = list(value_mac.parameters())
@@ -59,15 +61,18 @@ class HAVENLearner:
         self.target_macro_mixer = copy.deepcopy(self.macro_mixer)
 
         self.optimiser = RMSprop(params=self.params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
-        self.macro_optimiser = RMSprop(params=self.macro_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
+        if self.macro_mac is not None:
+            self.macro_optimiser = RMSprop(params=self.macro_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
+        else:
+            self.macro_optimiser = None
         if self.value_mac is not None:
             self.value_optimiser = RMSprop(params=self.value_params, lr=args.lr, alpha=args.optim_alpha, eps=args.optim_eps)
         else:
             self.value_optimiser = None
         # a little wasteful to deepcopy (e.g. duplicates action selector), but should work for any MAC
-        self.target_mac = copy.deepcopy(mac)
-        self.target_value_mac = copy.deepcopy(value_mac)
-        self.target_macro_mac = copy.deepcopy(macro_mac)
+        self.target_mac = copy.deepcopy(self.mac)
+        self.target_value_mac = copy.deepcopy(self.value_mac)
+        self.target_macro_mac = copy.deepcopy(self.macro_mac)
 
         self.log_stats_t = -self.args.learner_log_interval - 1
 
@@ -75,40 +80,38 @@ class HAVENLearner:
         if self.value_mac is None:
             return
         assert self.value_optimiser is not None
+        if self.macro_mac is not None:
+            next_value_mac = self.macro_mac
+            next_value_mixer = self.macro_mixer
+            is_qvalues = True
+        else:
+            assert self.target_value_mac is not None
+            next_value_mac = self.target_value_mac
+            next_value_mixer = self.target_value_mixer
+            is_qvalues = False
+
         rewards = batch["macro_reward"][:, :-1]
         terminated = batch["terminated"][:, :-1].float()
         mask = batch["filled"][:, :-1].float()
         mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
 
-        if self.value_mac.is_recurrent:
-            value_out, mac_out = [], []
-            self.value_mac.init_hidden(batch.batch_size)
-            self.macro_mac.init_hidden(batch.batch_size)
-            for t in range(batch.max_seq_length):
-                value = self.value_mac.forward(batch, t=t)
-                agent_outs = self.macro_mac.forward(batch, t=t)
-                value_out.append(value)
-                mac_out.append(agent_outs)
-            value_out = th.stack(value_out, dim=1)
-            mac_out = th.stack(mac_out[1:], dim=1)
-        else:
-            v_obs, v_extras, m_obs, m_extras = [], [], [], []
-            for t in range(batch.max_seq_length):
-                o, e = self.value_mac._build_inputs(batch, t)
-                v_obs.append(o)
-                v_extras.append(e)
-                o, e = self.macro_mac._build_inputs(batch, t)
-                m_obs.append(o)
-                m_extras.append(e)
-            v_obs = th.stack(v_obs, dim=1)
-            v_extras = th.stack(v_extras, dim=1)
-            m_obs = th.stack(m_obs[1:], dim=1)
-            m_extras = th.stack(m_extras[1:], dim=1)
-            value_out, _ = self.value_mac.agent.forward((v_obs, v_extras))
-            mac_out, _ = self.macro_mac.agent.forward((m_obs, m_extras))
+        value_out, mac_out = [], []
+        self.value_mac.init_hidden(batch.batch_size)
+        next_value_mac.init_hidden(batch.batch_size)
+        # self.macro_mac.init_hidden(batch.batch_size)
+        for t in range(batch.max_seq_length):
+            value = self.value_mac.forward(batch, t=t)
+            agent_outs = next_value_mac.forward(batch, t=t)
+            value_out.append(value)
+            mac_out.append(agent_outs)
+        value_out = th.stack(value_out, dim=1)
+        mac_out = th.stack(mac_out[1:], dim=1)
 
-        max_qvals = mac_out.max(dim=3)[0]
-        max_qvals = self.macro_mixer(max_qvals, batch["state"][:, 1:])
+        if is_qvalues:
+            max_qvals = mac_out.max(dim=3)[0]
+        else:
+            max_qvals = mac_out
+        max_qvals = next_value_mixer(max_qvals, batch["state"][:, 1:])
 
         values = self.value_mixer(value_out[:, :-1], batch["state"][:, :-1])
         # target_values = self.target_value_mixer(target_value_out[:, 1:], batch["state"][:, 1:])
@@ -224,6 +227,10 @@ class HAVENLearner:
             self.log_stats_t = t_env
 
     def macro_train(self, batch: EpisodeBatch, t_env: int, episode_num: int):
+        if self.macro_mac is None:
+            return
+        assert self.macro_optimiser is not None
+        assert self.target_macro_mac is not None
         # Get the relevant quantities
         rewards = batch["macro_reward"][:, :-1]
         actions = batch["macro_actions"][:, :-1]
@@ -316,6 +323,9 @@ class HAVENLearner:
         self.logger.console_logger.info("Updated target network")
 
     def _update_macro_targets(self):
+        if self.macro_mac is None:
+            return
+        assert self.target_macro_mac is not None
         self.target_macro_mac.load_state(self.macro_mac)
         if self.macro_mixer is not None:
             self.target_macro_mixer.load_state_dict(self.macro_mixer.state_dict())
@@ -332,8 +342,10 @@ class HAVENLearner:
         self.device = device
         self.mac.to(device)
         self.target_mac.to(device)
-        self.macro_mac.to(device)
-        self.target_macro_mac.to(device)
+        if self.macro_mac is not None:
+            self.macro_mac.to(device)
+        if self.target_macro_mac is not None:
+            self.target_macro_mac.to(device)
         if self.value_mac is not None:
             self.value_mac.to(device)
         if self.target_value_mac is not None:
@@ -358,10 +370,12 @@ class HAVENLearner:
         if self.value_mixer is not None and self.value_optimiser is not None:
             th.save(self.value_mixer.state_dict(), "{}/value_mixer.th".format(path))
             th.save(self.value_optimiser.state_dict(), "{}/value_opt.th".format(path))
-        self.macro_mac.save_models(path)
+        if self.macro_mac is not None:
+            self.macro_mac.save_models(path)
         if self.macro_mixer is not None:
             th.save(self.macro_mixer.state_dict(), "{}/macro_mixer.th".format(path))
-        th.save(self.macro_optimiser.state_dict(), "{}/macro_opt.th".format(path))
+        if self.macro_optimiser is not None:
+            th.save(self.macro_optimiser.state_dict(), "{}/macro_opt.th".format(path))
 
     def load_models(self, path):
         self.mac.load_models(path)
@@ -378,12 +392,15 @@ class HAVENLearner:
         if self.value_mixer is not None and self.value_optimiser is not None:
             self.value_mixer.load_state_dict(th.load("{}/value_mixer.th".format(path), map_location=lambda storage, loc: storage))
             self.value_optimiser.load_state_dict(th.load("{}/value_opt.th".format(path), map_location=lambda storage, loc: storage))
-        self.macro_mac.load_models(path)
+        if self.macro_mac is not None:
+            self.macro_mac.load_models(path)
         # Not quite right but I don't want to save target networks
-        self.target_macro_mac.load_models(path)
+        if self.target_macro_mac is not None:
+            self.target_macro_mac.load_models(path)
         if self.macro_mixer is not None:
             self.macro_mixer.load_state_dict(th.load("{}/macro_mixer.th".format(path), map_location=lambda storage, loc: storage))
-        self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
+        if self.macro_optimiser is not None:
+            self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
 
     def calc_intrinsic_reward(self, batch: EpisodeBatch, macro_batch: EpisodeBatch):
         if self.args.intrinsic_switch != 0 and self.value_mac is not None:
@@ -395,38 +412,22 @@ class HAVENLearner:
             mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
 
             if self.value_mac.is_recurrent:
-                assert self.macro_mac.is_recurrent
                 value_out = []
-                macro_mac_out = []
                 self.value_mac.init_hidden(macro_batch.batch_size)
-                self.macro_mac.init_hidden(macro_batch.batch_size)
                 for t in range(macro_batch.max_seq_length):
                     value_out.append(self.value_mac.forward(macro_batch, t=t))
-                    macro_mac_out.append(self.macro_mac.forward(macro_batch, t=t))
                 value_out = th.stack(value_out, dim=1)
-                macro_mac_out = th.stack(macro_mac_out, dim=1)  # Concat over time
             else:
-                v_obs, v_extras, m_obs, m_extras = [], [], [], []
+                v_obs, v_extras = [], []
                 for t in range(macro_batch.max_seq_length):
                     o, e = self.value_mac._build_inputs(macro_batch, t)
                     v_obs.append(o)
                     v_extras.append(e)
-                    o, e = self.macro_mac._build_inputs(macro_batch, t)
-                    m_obs.append(o)
-                    m_extras.append(e)
                 v_obs = th.stack(v_obs, dim=1)
                 v_extras = th.stack(v_extras, dim=1)
                 value_out, _ = self.value_mac.agent.forward((v_obs, v_extras))
-                m_obs = th.stack(m_obs, dim=1)
-                m_extras = th.stack(m_extras, dim=1)
-                macro_mac_out, _ = self.macro_mac.agent.forward((m_obs, m_extras))
 
             values = self.value_mixer(value_out, macro_batch["state"])
-            macro_mac_out = th.gather(macro_mac_out, dim=3, index=macro_batch["macro_actions"]).squeeze(3)
-            macro_mac_out = self.macro_mixer(macro_mac_out, macro_batch["state"])
-            # values = value_out.squeeze(-1)
-
-            # intrinsic_reward = (macro_mac_out[:, :-1] - values[:, :-1])
             macro_reward = macro_batch["macro_reward"][:, :-1]
             intrinsic_reward = macro_reward + self.args.gamma * values[:, 1:] - values[:, :-1]
             intrinsic_reward = intrinsic_reward.unsqueeze(-2)

@@ -113,7 +113,7 @@ class EpisodeBatch:
             else:
                 idx -= 1
 
-    def __getitem__(self, item) -> Any:
+    def __getitem__(self, item):
         if isinstance(item, str):
             if item in self.data.episode_data:
                 return self.data.episode_data[item]

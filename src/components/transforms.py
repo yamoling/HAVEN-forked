@@ -23,5 +23,13 @@ class OneHot(Transform):
 
 
 class NoTransform(Transform):
+    def __init__(self, n_outputs: int, dtype=th.float32):
+        super().__init__()
+        self.n_outputs = n_outputs
+        self.dtype = dtype
+
     def transform(self, tensor):
         return tensor
+
+    def infer_output_info(self, vshape_in, dtype_in):
+        return (self.n_outputs,), self.dtype
