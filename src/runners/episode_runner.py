@@ -92,7 +92,7 @@ class EpisodeRunner:
 
     def run(self, test_mode=False):
         self.reset()
-
+        macro_actions = None
         terminated = False
         episode_return = 0
         self.mac.init_hidden(batch_size=self.batch_size)
@@ -123,7 +123,10 @@ class EpisodeRunner:
             # Pass the entire batch of experiences up till now to the agents
             # Receive the actions for each agent at this timestep in a batch of size 1
             if self.macro_batch is not None and self.t % self.args.k == 0 and self.t != 0:
-                post_macro_transition_data = {"macro_actions": macro_actions, "macro_reward": [(macro_reward,)], "terminated": [(False,)]}  # noqa: F821
+                post_macro_transition_data = {"macro_reward": [(macro_reward,)], "terminated": [(False,)]}
+                if macro_actions is not None:
+                    post_macro_transition_data["macro_actions"] = macro_actions
+
                 macro_reward = 0
                 self.macro_batch.update(post_macro_transition_data, ts=self.t // self.args.k - 1)
             if self.macro_batch is not None and self.t % self.args.k == 0:
@@ -131,9 +134,9 @@ class EpisodeRunner:
                     macro_actions = self.macro_mac.select_actions(
                         self.macro_batch, t_ep=self.t // self.args.k, t_env=self.t_env, test_mode=test_mode
                     )
-                else:
+                elif "laser_shaping" in self.batch.scheme:
                     macro_actions = pre_transition_data["laser_shaping"]
-            if self.macro_batch is not None:
+            if self.macro_batch is not None and macro_actions is not None:
                 pre_transition_data = {
                     "subgoals": macro_actions,
                 }
@@ -158,10 +161,11 @@ class EpisodeRunner:
             self.t += 1
         if self.macro_batch is not None:
             post_macro_transition_data = {
-                "macro_actions": macro_actions,
                 "macro_reward": [(macro_reward,)],
                 "terminated": [(terminated != env_info.get("episode_limit", False),)],
             }
+            if macro_actions is not None:
+                post_macro_transition_data["macro_actions"] = (macro_actions,)
             # macro_index = (self.t - 1) // self.args.k if ((self.t - 1) % self.args.k) == 0 else (self.t - 1) // self.args.k + 1
             macro_index = (self.t - 1) // self.args.k
             self.macro_batch.update(post_macro_transition_data, ts=macro_index)
@@ -179,14 +183,15 @@ class EpisodeRunner:
 
         # Select actions in the last stored state
         if self.macro_batch is not None:
+            pre_transition_data = {}
             if self.macro_mac is not None:
                 macro_actions = self.macro_mac.select_actions(self.macro_batch, t_ep=macro_index + 1, t_env=self.t_env, test_mode=test_mode)
-            else:
+            elif "laser_shaping" in self.batch.scheme:
                 macro_actions = self.get_laser_shaping()
-            pre_transition_data = {
-                "subgoals": macro_actions,
-            }
-            self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index + 1)
+            if macro_actions is not None:
+                pre_transition_data["subgoals"] = macro_actions
+            if macro_actions is not None:
+                self.macro_batch.update({"macro_actions": macro_actions}, ts=macro_index + 1)
         else:
             pre_transition_data = {}
         self.batch.update(pre_transition_data, ts=self.t)

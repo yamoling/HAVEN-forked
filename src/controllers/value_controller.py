@@ -50,7 +50,7 @@ class ValueMAC(Controller):
         # Other MACs might want to e.g. delegate building inputs to each agent
         bs = batch.batch_size
         extras = []
-        if self.args.obs_last_action:
+        if self.args.obs_last_action and "macro_actions_onehot" in batch.scheme:
             if t == 0:
                 extras.append(th.zeros_like(batch["macro_actions_onehot"][:, t]))
             else:
@@ -73,7 +73,7 @@ class ValueMAC(Controller):
 
     def _get_input_shape(self, scheme) -> int | tuple[tuple, int]:
         extras_shape = 0
-        if self.args.obs_last_action:
+        if self.args.obs_last_action and "macro_actions_onehot" in scheme:
             extras_shape += scheme["macro_actions_onehot"]["vshape"][0]
         # There is no laser_shaping for the ValueMAC, although it may be encoded in the last_action
         # if "laser_shaping" in scheme:

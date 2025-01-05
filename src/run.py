@@ -140,12 +140,12 @@ def run_sequential(args, logger):
         else:
             assert isinstance(runner.env, PymarlAdapter)
             wrapped = runner.env.env.wrapped
-            assert isinstance(wrapped, LLEPotentialShaping)
-            shaped_subgoals = wrapped.get_laser_shaping()
-            # If the haven subgoals are disabled, we use the subgoals of the environment
-            scheme["subgoals"] = {"vshape": shaped_subgoals.shape[1], "group": "agents", "dtype": th.float32}
-            preprocess["subgoals"] = ("subgoals_onehot", [NoTransform(shaped_subgoals.shape[1])])
-            macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform(shaped_subgoals.shape[1])])
+            if isinstance(wrapped, LLEPotentialShaping):
+                shaped_subgoals = wrapped.get_laser_shaping()
+                # If the haven subgoals are disabled, we use the subgoals of the environment
+                scheme["subgoals"] = {"vshape": shaped_subgoals.shape[1], "group": "agents", "dtype": th.float32}
+                preprocess["subgoals"] = ("subgoals_onehot", [NoTransform(shaped_subgoals.shape[1])])
+                macro_preprocess["macro_actions"] = ("macro_actions_onehot", [NoTransform(shaped_subgoals.shape[1])])
     # else:
     # Check if we have to substitute the subgoals of Haven by the subgoals of the environment
     # assert isinstance(env, PymarlAdapter)
