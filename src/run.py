@@ -25,8 +25,7 @@ def run(_run, _config, _log):
     _config = args_sanity_check(_config, _log)
 
     args = SN(**_config)
-    if not th.cuda.is_available():
-        args.use_cuda = False
+    args.use_cuda = th.cuda.is_available()
     if args.use_cuda:
         n_devices = th.cuda.device_count()
         seed = args.env_args.get("seed", 0)

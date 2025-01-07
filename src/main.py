@@ -30,9 +30,9 @@ def my_main(_run, _config, _log):
     config["seed"] = config["env_args"]["seed"]
     np.random.seed(config["seed"])
     th.manual_seed(config["seed"])
-    th.cuda.manual_seed(config["seed"])
-    th.backends.cudnn.benchmark = False
-    th.backends.cudnn.deterministic = True
+    # th.cuda.manual_seed(config["seed"])
+    # th.backends.cudnn.benchmark = False
+    # th.backends.cudnn.deterministic = True
 
     # run the framework
     run(_run, config, _log)
