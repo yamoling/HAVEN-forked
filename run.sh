@@ -1,6 +1,6 @@
 #!/bin/bash
 envs=("shaped-lle-no-subgoals")
-configs=("vdn-cnn")
+configs=("qmix-cnn")
 n_seeds=8
 n_concurrent=16
 
