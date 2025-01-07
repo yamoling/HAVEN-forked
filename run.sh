@@ -1,5 +1,5 @@
 #!/bin/bash
-envs=("shaped-lle-no-reward")
+envs=("lle-lvl6")
 configs=("haven-cnn-vdn-no-subgoal")
 n_seeds=8
 n_concurrent=16
