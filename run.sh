@@ -1,6 +1,6 @@
 #!/bin/bash
-envs=("shaped-lle-no-subgoals")
-configs=("qmix-cnn")
+envs=("lle-lvl6")
+configs=("haven-cnn-vdn-no-subgoal-value-potential")
 n_seeds=8
 n_concurrent=16
 
