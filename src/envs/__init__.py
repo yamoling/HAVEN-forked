@@ -6,6 +6,7 @@ import marlenv
 from lle import LLE
 from lle.tiles import Direction
 from .shaping import LLEPotentialShaping
+from .randomized_lle import RandomizedLLE
 
 # from .grf import Academy_3_vs_1_with_Keeper, Academy_Pass_and_Shoot_with_Keeper, Academy_Run_Pass_and_Shoot_with_Keeper, Academy_Corner
 
@@ -80,10 +81,15 @@ def shaped_lle(
     return marlenv.adapters.PymarlAdapter(env, time_limit)
 
 
+def make_randomized_lle(*, map: str | int, seed: int | None = None):
+    pass
+
+
 REGISTRY = {
     "sc2": partial(env_fn, env=StarCraft2Env),
     "lle": lle_fn,
     "shaped_lle": shaped_lle,
+    "randomized_lle": make_randomized_lle,
     # "academy_3_vs_1_with_keeper": partial(env_fn, env=Academy_3_vs_1_with_Keeper),
     # "academy_pass_and_shoot_with_keeper": partial(env_fn, env=Academy_Pass_and_Shoot_with_Keeper),
     # "academy_run_pass_and_shoot_with_keeper": partial(env_fn, env=Academy_Run_Pass_and_Shoot_with_Keeper),

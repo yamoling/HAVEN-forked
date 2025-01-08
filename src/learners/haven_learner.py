@@ -403,6 +403,31 @@ class HAVENLearner:
             self.macro_optimiser.load_state_dict(th.load("{}/macro_opt.th".format(path), map_location=lambda storage, loc: storage))
 
     def calc_intrinsic_reward(self, batch: EpisodeBatch, macro_batch: EpisodeBatch):
+        if self.args.intrinsic_type == "advantage":
+            return self.calc_advantage_ir(batch, macro_batch)
+        elif self.args.intrinsic_type == "potential":
+            return self.calc_value_potential_ir(batch)
+        raise ValueError(f"Intrinsic type {self.args.intrinsic_type} not recognised.")
+
+    def calc_value_potential_ir(self, batch: EpisodeBatch):
+        assert self.value_mac is not None
+        v_obs, v_extras = [], []
+        for t in range(batch.max_seq_length):
+            o, e = self.value_mac._build_inputs(batch, t)
+            v_obs.append(o)
+            v_extras.append(e)
+        v_obs = th.stack(v_obs, dim=1)
+        v_extras = th.stack(v_extras, dim=1)
+        with th.no_grad():
+            value_out, _ = self.value_mac.agent.forward((v_obs, v_extras))
+            values = self.value_mixer.forward(value_out, batch["state"])
+        phi_s = values[:, :-1]
+        phi_s_prime = values[:, 1:]
+        intrinsic_reward = self.args.gamma * phi_s_prime - phi_s
+        reward = batch["reward"][:, :-1]
+        return intrinsic_reward + reward
+
+    def calc_advantage_ir(self, batch: EpisodeBatch, macro_batch: EpisodeBatch):
         if self.args.intrinsic_switch != 0 and self.value_mac is not None:
             origin_reward = batch["reward"][:, :-1]
             if self.args.mean_weight:
