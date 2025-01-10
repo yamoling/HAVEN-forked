@@ -12,6 +12,7 @@ from .randomized_lle import RandomizedLLE
 
 
 def env_fn(env, **kwargs) -> MultiAgentEnv:
+    kwargs.pop("gamma")
     return env(**kwargs)
 
 

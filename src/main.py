@@ -101,7 +101,6 @@ if __name__ == "__main__":
         path = path + "_" + env_args["map_name"]
     elif "map" in env_args:
         path = path + "_" + str(env_args["map"])
-    ir_weight = config_dict["intrinsic_switch"]
     algo_name = config_dict["name"]
     path = f"{path}_{algo_name}"
     if config_dict["env"] == "shaped_lle":

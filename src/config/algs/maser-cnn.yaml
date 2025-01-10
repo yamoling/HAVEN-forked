@@ -1,0 +1,42 @@
+# --- QMIX specific parameters ---
+# --- This config file uses the episodic runner, which is useful for testing locally ---
+
+# use epsilon greedy action selector
+action_selector: 
+  type: "epsilon_greedy"
+  epsilon_start: 1.0
+  epsilon_finish: 0.05
+  epsilon_anneal_time: 50000
+epsilon_start: 1.0
+epsilon_finish: 0.05
+epsilon_anneal_time: 50000
+
+runner: "episode"
+batch_size_run: 1
+
+buffer_size: 5000
+
+# update the target network every {} episodes
+target_update_interval: 200
+
+# use the Q_Learner to train
+agent_output_type: "q"
+learner: "maser_q_learner"
+double_q: True
+mixer: "vdn"
+mixing_embed_dim: 32
+lam: 0.03
+alpha: 0.5
+ind: 1.0
+mix: 1.0
+expl: 1.0
+dis: 1.0
+goal: "maser"
+name: "maser-vdn"
+map_print: "8m_vs_9m"
+timestep: "2000051"
+
+latent_dim: 3
+NN_HIDDEN_SIZE: 16
+var_floor: 0.002
+agent: "cnn"

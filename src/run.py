@@ -33,6 +33,8 @@ def run(_run, _config, _log):
     else:
         args.device = th.device("cpu")
 
+    if not hasattr(args, "intrinsic_switch"):
+        args.intrinsic_switch = 0
     args.train_value = args.intrinsic_switch > 0
 
     # setup loggers
