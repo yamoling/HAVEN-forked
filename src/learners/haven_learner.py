@@ -218,12 +218,14 @@ class HAVENLearner:
             self.last_target_update_episode = episode_num
 
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
-            self.logger.log_stat("loss", loss.item(), t_env)
-            self.logger.log_stat("grad_norm", grad_norm.detach().item(), t_env)
+            self.logger.log_stat("loss", float(loss.item()), t_env)
+            self.logger.log_stat("grad_norm", float(grad_norm.detach().item()), t_env)
             mask_elems = mask.sum().item()
-            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item() / mask_elems), t_env)
-            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
-            self.logger.log_stat("target_mean", (targets * mask).sum().item() / (mask_elems * self.args.n_agents), t_env)
+            self.logger.log_stat("td_error_abs", float((masked_td_error.abs().sum().item() / mask_elems)), t_env)
+            self.logger.log_stat(
+                "q_taken_mean", float((chosen_action_qvals * mask).sum().item() / (mask_elems * self.args.n_agents)), t_env
+            )
+            self.logger.log_stat("target_mean", float((targets * mask).sum().item() / (mask_elems * self.args.n_agents)), t_env)
             self.log_stats_t = t_env
 
     def macro_train(self, batch: EpisodeBatch, t_env: int, episode_num: int):
@@ -315,7 +317,7 @@ class HAVENLearner:
             self._update_macro_targets()
             self.last_target_macro_update_episode = episode_num
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
-            self.logger.log_stat("macro_loss", loss.item(), t_env)
+            self.logger.log_stat("macro_loss", float(loss.item()), t_env)
 
     def _update_targets(self):
         self.target_mac.load_state(self.mac)
