@@ -5,9 +5,10 @@ from modules.mixers.qmix import QMixer
 import torch as th
 from torch.optim import RMSprop
 from controllers import ValueMAC, MacroMAC, BasicMAC
+from .learner import Learner
 
 
-class HAVENLearner:
+class HAVENLearner(Learner):
     def __init__(self, mac: BasicMAC, macro_mac: MacroMAC | None, value_mac: ValueMAC | None, scheme, logger, args):
         self.args = args
         self.mac = mac
@@ -91,8 +92,8 @@ class HAVENLearner:
             is_qvalues = False
 
         rewards = batch["macro_reward"][:, :-1]
-        terminated = batch["terminated"][:, :-1].float()
-        mask = batch["filled"][:, :-1].float()
+        terminated = batch["terminated"][:, :-1].float()  # type: ignore
+        mask = batch["filled"][:, :-1].float()  # type: ignore
         mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
 
         value_out, mac_out = [], []
@@ -138,8 +139,8 @@ class HAVENLearner:
     def train(self, batch: EpisodeBatch, macro_batch: EpisodeBatch, t_env: int, episode_num: int):
         actions = batch["actions"][:, :-1]
         intrinsic_reward = self.calc_intrinsic_reward(batch, macro_batch)
-        terminated = batch["terminated"][:, :-1].float()
-        mask = batch["filled"][:, :-1].float()
+        terminated = batch["terminated"][:, :-1].float()  # type: ignore
+        mask = batch["filled"][:, :-1].float()  # type: ignore
         mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
         avail_actions = batch["avail_actions"]
 
@@ -177,7 +178,7 @@ class HAVENLearner:
         next_qvalues[avail_actions[:, 1:] == 0] = -9999999
 
         # Pick the Q-Values for the actions taken by each agent
-        chosen_action_qvals = th.gather(qvalues[:, :-1], dim=3, index=actions).squeeze(3)  # Remove the last dim
+        chosen_action_qvals = th.gather(qvalues[:, :-1], dim=3, index=actions).squeeze(3)  # type: ignore
 
         # Max over target Q-Values
         if self.args.double_q:
@@ -236,8 +237,8 @@ class HAVENLearner:
         # Get the relevant quantities
         rewards = batch["macro_reward"][:, :-1]
         actions = batch["macro_actions"][:, :-1]
-        terminated = batch["terminated"][:, :-1].float()
-        mask = batch["filled"][:, :-1].float()
+        terminated = batch["terminated"][:, :-1].float()  # type: ignore
+        mask = batch["filled"][:, :-1].float()  # type: ignore
         mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
 
         # Calculate estimated Q-Values
@@ -259,7 +260,7 @@ class HAVENLearner:
             mac_out, _ = self.macro_mac.agent.forward((obs, extras))
 
         # Pick the Q-Values for the actions taken by each agent
-        chosen_action_qvals = th.gather(mac_out[:, :-1], dim=3, index=actions).squeeze(3)  # Remove the last dim
+        chosen_action_qvals = th.gather(mac_out[:, :-1], dim=3, index=actions).squeeze(3)  # type: ignore
 
         # Calculate the Q-Values necessary for the target
         if self.target_macro_mac.is_recurrent:

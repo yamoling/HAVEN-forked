@@ -4,9 +4,10 @@ from modules.mixers.vdn import VDNMixer
 from modules.mixers.qmix import QMixer
 import torch as th
 from torch.optim import RMSprop
+from .learner import Learner
 
 
-class QLearner:
+class QLearner(Learner):
     def __init__(self, mac, macro_mac, value_mac, scheme, logger, args):
         self.args = args
         self.mac = mac

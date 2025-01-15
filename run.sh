@@ -1,7 +1,9 @@
 #!/bin/bash
 #configs[0]="--config=maser-cnn --env-config=lle-lvl6"
-configs[0]="--config=qmix-cnn --env-config=shaped-lle"
-n_seeds=16
+#configs[0]="--config=qmix-cnn --env-config=shaped-lle"
+configs[0]="--config=qplex --env-config=lle-lvl6"
+configs[1]="--config=qplex --env-config=shaped-lle"
+n_seeds=8
 n_concurrent=16
 
 j=0

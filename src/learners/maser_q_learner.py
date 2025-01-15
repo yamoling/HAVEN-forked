@@ -10,9 +10,10 @@ import torch.nn.functional as F
 import torch.nn as nn
 from controllers import BasicMAC
 from modules.agents.cnn import make_cnn
+from .learner import Learner
 
 
-class MASERQLearner:
+class MASERQLearner(Learner):
     def __init__(self, mac: BasicMAC, macro_mac, value_mac, scheme: dict[str, Any], logger, args):
         self.args = args
         self.mac = mac

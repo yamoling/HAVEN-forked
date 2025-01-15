@@ -4,9 +4,10 @@ from modules.critics.coma import COMACritic
 from utils.rl_utils import build_td_lambda_targets
 import torch as th
 from torch.optim import RMSprop
+from .learner import Learner
 
 
-class COMALearner:
+class COMALearner(Learner):
     def __init__(self, mac, scheme, logger, args):
         self.args = args
         self.n_agents = args.n_agents

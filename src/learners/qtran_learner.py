@@ -2,10 +2,11 @@ import copy
 from components.episode_buffer import EpisodeBatch
 from modules.mixers.qtran import QTranBase
 import torch as th
-from torch.optim import RMSprop, Adam
+from torch.optim import RMSprop
+from .learner import Learner
 
 
-class QLearner:
+class QLearner(Learner):
     def __init__(self, mac, scheme, logger, args):
         self.args = args
         self.mac = mac
