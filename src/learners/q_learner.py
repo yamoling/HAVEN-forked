@@ -109,7 +109,7 @@ class QLearner(Learner):
 
         if t_env - self.log_stats_t >= self.args.learner_log_interval:
             self.logger.log_stat("loss", float(loss.item()), t_env)
-            self.logger.log_stat("grad_norm", float(grad_norm), t_env)
+            self.logger.log_stat("grad_norm", float(grad_norm.item()), t_env)
             mask_elems = mask.sum().item()
             self.logger.log_stat("td_error_abs", float((masked_td_error.abs().sum().item() / mask_elems)), t_env)
             self.logger.log_stat(
