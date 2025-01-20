@@ -36,6 +36,7 @@ class PotentialShaping(RLEnvWrapper):
 
     def reset(self):
         obs, state = super().reset()
+        self.current_potential = self.compute_potential()
         return self.add_extras(obs), state
 
     def step(self, actions):
@@ -43,7 +44,7 @@ class PotentialShaping(RLEnvWrapper):
         step = super().step(actions)
 
         self.current_potential = self.compute_potential()
-        shaped_reward = self.gamma * phi_t - self.current_potential
+        shaped_reward = self.gamma * self.current_potential - phi_t
         step.obs = self.add_extras(step.obs)
         step.reward += shaped_reward
         return step
@@ -89,9 +90,9 @@ class LLEPotentialShaping(PotentialShaping):
             # Make sure that the source and direction are compatible
             source_is_vertical = source.direction in VERTICAL
             goal_direction_is_horizontal = direction in HORIZONTAL
-            assert (
-                source_is_vertical == goal_direction_is_horizontal
-            ), "The source and direction are incompatible. For horizontal lasers, the direction must be vertical and vice versa."
+            assert source_is_vertical == goal_direction_is_horizontal, (
+                "The source and direction are incompatible. For horizontal lasers, the direction must be vertical and vice versa."
+            )
             in_laser_rewards = set[Position]()
             after_laser_rewards = set[Position]()
             for (i, j), laser in world.lasers:
@@ -110,7 +111,7 @@ class LLEPotentialShaping(PotentialShaping):
             for j, rewarded_positions in enumerate(self.pos_to_reward):
                 if agent_pos in rewarded_positions:
                     self.agents_pos_reached[agent_num, j] = True
-        return float(self.agents_pos_reached.size - self.agents_pos_reached.sum()) * self.reward_value
+        return -float(self.agents_pos_reached.size - self.agents_pos_reached.sum()) * self.reward_value
 
     def get_laser_shaping(self):
         return self.agents_pos_reached.astype(np.float32)
